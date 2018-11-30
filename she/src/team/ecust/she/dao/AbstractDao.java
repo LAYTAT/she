@@ -10,13 +10,13 @@ import java.sql.ResultSet;
 
 /**数据库抽象类，所有DAO的父类。*/
 public abstract class AbstractDao {
-	/**MySQL驱动器选项*/
+	/**MySQL驱动器选项{@value}*/
 	private final static String DRIVER   = "com.mysql.jdbc.Driver";
-	/**服务器数据库的URL*/
+	/**服务器数据库的URL{@value}*/
 	private final static String URL      = "jdbc:mysql://localhost:3306/she";
-	/**服务器配置时的用户名*/
+	/**服务器配置时的用户名{@value}*/
 	private final static String USER     = "root";
-	/**服务器配置时的密码*/
+	/**服务器配置时的密码{@value}*/
 	private final static String PASSWORD = "326623";
 	
 	/**存储数据库加载状态，不要初始化*/
@@ -42,17 +42,16 @@ public abstract class AbstractDao {
 	 * 加载数据库驱动并返回执行结果。
 	 * @return 数据库驱动的加载状态，成功加载返回true，失败返回false
 	 */
-	public static boolean driveMySQL()
-	{
+	public static boolean driveMySQL() {
 		try {
 			Class.forName(DRIVER);
 			return (VIABLE = true);
 		} catch (ClassNotFoundException e1) {
-			System.err.println("->找不到MySQL的加载驱动类！");
+			System.err.println("->找不到MySQL的加载驱动类");
 		} catch (ExceptionInInitializerError e2) {
-			System.err.println("->初始化驱动类时出现错误，加载失败！");
+			System.err.println("->初始化驱动类时出现错误，加载失败");
 		} catch (LinkageError e3) {
-			System.err.println("->连接驱动失败！");
+			System.err.println("->连接驱动失败");
 		}
 		return (VIABLE = false);
 	}
@@ -62,14 +61,13 @@ public abstract class AbstractDao {
 	 * 发生异常时会更新消息。
 	 * @return 正常连接的对象或异常连接的空对象
 	 */
-	protected Connection getConnection()
-	{
+	protected Connection getConnection() {
 		try {
 			return DriverManager.getConnection(URL, USER, PASSWORD);
 		} catch (SQLTimeoutException e1) {
-			message = "服务器连接超时！";
+			message = "服务器连接超时";
 		} catch (SQLException e2) {
-			message = "服务器连接错误或其它错误！";
+			message = "服务器连接错误或其它错误";
 		}
 		return null;
 	}
@@ -80,8 +78,7 @@ public abstract class AbstractDao {
 	 * @param sql 需要执行的SQL语句
 	 * @return 只有成功查询了数据库数据才返回结果集，其它情况都返回null
 	 */
-	protected ResultSet getResult(String sql)
-	{
+	protected ResultSet getResult(String sql) {
 		Connection conn = getConnection();
 		if(conn == null)
 			return null;
@@ -90,9 +87,9 @@ public abstract class AbstractDao {
 			state = conn.createStatement();
 			return state.executeQuery(sql);
 		} catch (SQLTimeoutException e1) {
-			message = "服务器连接超时！";
+			message = "服务器连接超时";
 		} catch (SQLException e2) {
-			message = "服务器连接错误或其它错误！";
+			message = "服务器连接错误或其它错误";
 		} finally {
 			try {
 				if(state != null)
@@ -100,7 +97,7 @@ public abstract class AbstractDao {
 				if(conn != null)
 					conn.close();
 			} catch (SQLException e3) {
-				message = "服务器连接关闭错误！";
+				message = "服务器连接关闭错误";
 			}
 		}
 		return null;
@@ -112,8 +109,7 @@ public abstract class AbstractDao {
 	 * @param sql 需要执行的SQL语句
 	 * @return 只有成功更新了数据库表的数据才返回true，其它情况都返回false
 	 */
-	protected boolean update(String sql)
-	{
+	protected boolean update(String sql) {
 		Connection conn = getConnection();
 		if(conn == null)
 			return false;
@@ -123,9 +119,9 @@ public abstract class AbstractDao {
 			state.executeUpdate();
 			return true;
 		} catch (SQLTimeoutException e1) {
-			message = "服务器连接超时！";
+			message = "服务器连接超时";
 		} catch (SQLException e2) {
-			message = "服务器连接错误或其它错误！";
+			message = "服务器连接错误或其它错误";
 		} finally {
 			try {
 				if(state != null)
@@ -133,7 +129,7 @@ public abstract class AbstractDao {
 				if(conn != null)
 					conn.close();
 			} catch (SQLException e3) {
-				message = "服务器连接关闭错误！";
+				message = "服务器连接关闭错误";
 			}
 		}
 		return false;
