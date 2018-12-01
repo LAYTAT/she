@@ -9,6 +9,7 @@ import team.ecust.she.view.PromptBox.Tips;
 
 import java.awt.Toolkit;
 import javax.swing.JPanel;
+
 import java.awt.BorderLayout;
 import java.awt.Cursor;
 import java.awt.Dimension;
@@ -21,9 +22,15 @@ import com.wis.pack.component.Photo;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.FlowLayout;
+import java.awt.GridLayout;
 import java.awt.Image;
 
 import javax.swing.border.LineBorder;
+import javax.swing.JTextField;
+import javax.swing.JButton;
+import javax.swing.JScrollPane;
+import java.awt.CardLayout;
+import java.awt.Component;
 
 /**首页界面类，也是窗口的整体框架，包含主函数。*/
 public final class Index {
@@ -37,12 +44,14 @@ public final class Index {
 	
 	/**窗体对象*/
 	private JFrame frame;
+	/**搜索文本框*/
+	private JTextField search;
 	/**头像面板*/
 	private Photo headPortrait;
 	/**昵称标签*/
 	private JLabel nickname;
-	/**消息标签*/
-	private JLabel messages;
+	/**卡片内容面板*/
+	private JPanel card;
 
 	/**
 	 * 在主函数里启动应用程序。
@@ -55,7 +64,7 @@ public final class Index {
 					Index window = new Index();
 					window.frame.setVisible(true);
 				} catch (Exception e) {
-					(new PromptBox(Tips.ERROR)).open("窗体异常退出");
+					(new PromptBox(Tips.ERROR)).open("软件异常退出");
 				}
 			}
 		});
@@ -63,7 +72,7 @@ public final class Index {
 
 	/**加载首页对象。 */
 	public Index() {
-		READ_MESSAGE = false;
+		READ_MESSAGE = true;
 		initialize();
 	}
 
@@ -77,35 +86,84 @@ public final class Index {
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.setExtendedState(frame.getState() | JFrame.MAXIMIZED_BOTH);//最大化启动
 		frame.setIconImage(Toolkit.getDefaultToolkit().getImage(Index.class.getResource("/team/ecust/she/resource/image/window.png")));//设置任务栏图标
-		
+		loadTopBar();
+		loadContent();
+		loadCard();
+	}
+	
+	/**加载顶栏内容。*/
+	private void loadTopBar() {
 		JPanel topBar = new JPanel();
-		topBar.setBorder(new EmptyBorder(12, 20, 12, 20));//限定顶栏的边界宽度
 		topBar.setBackground(Colors.TOP_BAR_BACKGROUND.getColor());
 		frame.getContentPane().add(topBar, BorderLayout.NORTH);
 		
 		FlowLayout topBarLayout = (FlowLayout) topBar.getLayout();//设置顶栏布局
-		topBarLayout.setHgap(20);
-		topBarLayout.setVgap(0);
+		topBarLayout.setHgap(20);//水平间距width
+		topBarLayout.setVgap(12);//设置顶栏的上下边界高度
 		
-		JLabel topBarTitle = new JLabel("华理二手平台");
-		int width = SCREEN_WIDTH - 440 - 12*Fonts.SHE_TITLE.getFont().getSize();
-		topBarTitle.setBorder(new EmptyBorder(0, 0, 0, width));//设置标题标签的右边界以适应窗口宽度
+		JLabel topBarTitle = new JLabel("华理二手物品交易平台");
 		topBarTitle.setFont(Fonts.SHE_TITLE.getFont());
 		topBarTitle.setForeground(Colors.SHE_TILTLE_FOREGROUND.getColor());
 		topBarTitle.setIcon(new ImageIcon(Index.class.getResource("/team/ecust/she/resource/image/logo.png")));
-		topBar.add(topBarTitle);
+		topBar.add(topBarTitle);//-width-title.length(10)
+		
+		JPanel input = new JPanel();//查询部分的面板
+		input.setBorder(new EmptyBorder(0, 100, 0, 0));
+		input.setBackground(Colors.TOP_BAR_BACKGROUND.getColor());
+		topBar.add(input);//-width-100
+		
+		FlowLayout inputLayout = (FlowLayout) input.getLayout();//设置查询部分的布局
+		inputLayout.setVgap(0);//紧密贴合
+		inputLayout.setHgap(0);
+		
+		search = new JTextField();
+		search.setBorder(null);
+		search.setPreferredSize(new Dimension(240, 28));//适应大小
+		search.setFont(Fonts.TOP_BAR_SEARCH.getFont());
+		search.setBackground(Colors.TOP_BAR_SEARCH_BACKGROUND.getColor());
+		search.setForeground(Colors.TOP_BAR_SEARCH_FOREGROUND.getColor());
+		input.add(search);//-240
+		
+		JButton query = new JButton("搜索");
+		query.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseEntered(MouseEvent e) {
+				frame.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+			}
+			@Override
+			public void mouseExited(MouseEvent e) {
+				frame.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
+			}
+		});
+		query.setBorder(null);
+		query.setPreferredSize(new Dimension(70, 28));
+		query.setFont(Fonts.TOP_BAR_SEARCH.getFont());
+		query.setBackground(Colors.TOP_BAR_SEARCH_BACKGROUND.getColor());
+		query.setForeground(Colors.TOP_BAR_SEARCH_FOREGROUND.getColor());
+		input.add(query);//-70
+		
+		//公式：SCREEN_WIDTH - 14*width - 528 - 1.2*10*title.size - 1.2*5*nickname.size//中文=1.2*英文
+		int fitWidth = SCREEN_WIDTH - 848 - 12*Fonts.SHE_TITLE.getSize() - 6*Fonts.TOP_BAR_NICKNAME.getSize();
+		JPanel blank = new JPanel();
+		blank.setPreferredSize(new Dimension(fitWidth, 10));//设置占位面板的最佳宽度
+		blank.setBackground(Colors.TOP_BAR_BACKGROUND.getColor());
+		topBar.add(blank);//-width
 		
 		headPortrait = new Photo("src/team/ecust/she/resource/image/unknown.jpg");
 		headPortrait.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseEntered(MouseEvent e) {
-				frame.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+				headPortrait.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
 				headPortrait.setBorder(new LineBorder(Colors.TOP_BAR_HEAD_PORTRAIT_BORDER.getColor(), 2));
 			}
 			@Override
 			public void mouseExited(MouseEvent e) {
-				frame.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
+				headPortrait.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
 				headPortrait.setBorder(new LineBorder(Colors.TOP_BAR_BACKGROUND.getColor(), 2));
+			}
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				showHeadPortraitInCard();
 			}
 		});
 		headPortrait.setPhotoLocation(2, 2);
@@ -113,7 +171,7 @@ public final class Index {
 		headPortrait.setPreferredSize(new Dimension(36, 36));//强制头像的大小，实际大小要减边界宽度
 		headPortrait.setBorder(new LineBorder(Colors.TOP_BAR_BACKGROUND.getColor(), 2));
 		headPortrait.setBackground(Colors.TOP_BAR_BACKGROUND.getColor());
-		topBar.add(headPortrait);
+		topBar.add(headPortrait);//-width-36
 		
 		nickname = new JLabel("未登录...");
 		nickname.addMouseListener(new MouseAdapter() {
@@ -130,12 +188,12 @@ public final class Index {
 		});
 		nickname.setFont(Fonts.TOP_BAR_NICKNAME.getFont());
 		nickname.setForeground(Colors.TOP_BAR_NICKNAME_FOREGROUND_OUT.getColor());
-		topBar.add(nickname);
+		topBar.add(nickname);//-width-nickname.length(5)
 		
 		JPanel severance_1 = new JPanel();
 		severance_1.setBackground(Colors.TOP_BAR_SEVERANCE_FOREGROUND.getColor());
 		severance_1.setPreferredSize(new Dimension(1, 30));
-		topBar.add(severance_1);
+		topBar.add(severance_1);//-width-1
 		
 		JLabel appearance = new JLabel();
 		appearance.addMouseListener(new MouseAdapter() {
@@ -151,9 +209,9 @@ public final class Index {
 			}
 		});
 		appearance.setIcon(new ImageIcon(Index.class.getResource("/team/ecust/she/resource/image/severance_o.png")));
-		topBar.add(appearance);
+		topBar.add(appearance);//-width-20
 		
-		messages = new JLabel();
+		JLabel messages = new JLabel();
 		messages.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseEntered(MouseEvent e) {
@@ -172,11 +230,8 @@ public final class Index {
 					messages.setIcon(new ImageIcon(Index.class.getResource("/team/ecust/she/resource/image/messages_uo.png")));
 			}
 		});
-		if(READ_MESSAGE)
-			messages.setIcon(new ImageIcon(Index.class.getResource("/team/ecust/she/resource/image/messages_o.png")));
-		else
-			messages.setIcon(new ImageIcon(Index.class.getResource("/team/ecust/she/resource/image/messages_uo.png")));
-		topBar.add(messages);
+		messages.setIcon(new ImageIcon(Index.class.getResource("/team/ecust/she/resource/image/messages_o.png")));
+		topBar.add(messages);//-width-20
 		
 		JLabel settings = new JLabel();
 		settings.addMouseListener(new MouseAdapter() {
@@ -192,12 +247,12 @@ public final class Index {
 			}
 		});
 		settings.setIcon(new ImageIcon(Index.class.getResource("/team/ecust/she/resource/image/settings_o.png")));
-		topBar.add(settings);
+		topBar.add(settings);//-width-20
 		
 		JPanel severance_2 = new JPanel();
 		severance_2.setBackground(Colors.TOP_BAR_SEVERANCE_FOREGROUND.getColor());
 		severance_2.setPreferredSize(new Dimension(1, 30));
-		topBar.add(severance_2);
+		topBar.add(severance_2);//-width-1
 		
 		JLabel minimum = new JLabel();
 		minimum.addMouseListener(new MouseAdapter() {
@@ -217,7 +272,7 @@ public final class Index {
 			}
 		});
 		minimum.setIcon(new ImageIcon(Index.class.getResource("/team/ecust/she/resource/image/minimum_o.png")));
-		topBar.add(minimum);
+		topBar.add(minimum);//-width-20
 		
 		JLabel maximum = new JLabel();
 		maximum.addMouseListener(new MouseAdapter() {
@@ -233,7 +288,7 @@ public final class Index {
 			}
 		});
 		maximum.setIcon(new ImageIcon(Index.class.getResource("/team/ecust/she/resource/image/maximum_fo.png")));
-		topBar.add(maximum);
+		topBar.add(maximum);//-width-20
 		
 		JLabel close = new JLabel();
 		close.addMouseListener(new MouseAdapter() {
@@ -254,22 +309,357 @@ public final class Index {
 			}
 		});
 		close.setIcon(new ImageIcon(Index.class.getResource("/team/ecust/she/resource/image/close_o.png")));
-		topBar.add(close);
+		topBar.add(close);//-width-20-width
+	}
+	
+	/**加载目录内容。*/
+	private void loadContent() {
+		JPanel content = new JPanel(new GridLayout(20, 0, 0, 0));//根据实际情况调整目录行数和竖直间距
+		content.setBorder(new EmptyBorder(10, 10, 0, 20));//设置左右边界宽度
+		content.setBackground(Colors.LEFT_CONTENT_BACKGROUND.getColor());
 		
+		JScrollPane scrollPane = new JScrollPane(content);
+		scrollPane.setBorder(null);
+		scrollPane.setPreferredSize(new Dimension(300, 100));//设置滚动面板宽度，高度自适应
+		frame.getContentPane().add(scrollPane, BorderLayout.WEST);
+		
+		JLabel mine = new JLabel("我的账户");
+		//mine.setBorder(new LineBorder(Colors.TOP_BAR_BACKGROUND.getColor(), 1));
+		mine.setFont(Fonts.LEFT_CONTENT_TITLE.getFont());
+		mine.setForeground(Colors.LEFT_CONTENT_TITLE_FOREGROUND.getColor());
+		content.add(mine);
+		
+		JButton myInfo = new JButton("个人信息");
+		myInfo.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseEntered(MouseEvent e) {
+				myInfo.setBackground(Colors.TOP_BAR_BACKGROUND.getColor());
+			}
+			@Override
+			public void mouseExited(MouseEvent e) {
+				myInfo.setBackground(Colors.LEFT_CONTENT_BACKGROUND.getColor());
+			}
+		});
+		myInfo.setBorder(null);
+		myInfo.setFont(Fonts.LEFT_CONTENT_OPTION.getFont());
+		myInfo.setBackground(Colors.LEFT_CONTENT_BACKGROUND.getColor());
+		myInfo.setIcon(new ImageIcon(Index.class.getResource("/team/ecust/she/resource/image/myinfo.png")));
+		content.add(myInfo);
+		
+		JButton modifyInfo = new JButton("修改信息");
+		modifyInfo.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseEntered(MouseEvent e) {
+				modifyInfo.setBackground(Colors.TOP_BAR_BACKGROUND.getColor());
+			}
+			@Override
+			public void mouseExited(MouseEvent e) {
+				modifyInfo.setBackground(Colors.LEFT_CONTENT_BACKGROUND.getColor());
+			}
+		});
+		modifyInfo.setBorder(null);
+		modifyInfo.setFont(Fonts.LEFT_CONTENT_OPTION.getFont());
+		modifyInfo.setBackground(Colors.LEFT_CONTENT_BACKGROUND.getColor());
+		modifyInfo.setIcon(new ImageIcon(Index.class.getResource("/team/ecust/she/resource/image/modifyinfo.png")));
+		content.add(modifyInfo);
+		
+		JButton uploadIdleGoods = new JButton("上传闲置");
+		uploadIdleGoods.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseEntered(MouseEvent e) {
+				uploadIdleGoods.setBackground(Colors.TOP_BAR_BACKGROUND.getColor());
+			}
+			@Override
+			public void mouseExited(MouseEvent e) {
+				uploadIdleGoods.setBackground(Colors.LEFT_CONTENT_BACKGROUND.getColor());
+			}
+		});
+		uploadIdleGoods.setBorder(null);
+		uploadIdleGoods.setFont(Fonts.LEFT_CONTENT_OPTION.getFont());
+		uploadIdleGoods.setBackground(Colors.LEFT_CONTENT_BACKGROUND.getColor());
+		uploadIdleGoods.setIcon(new ImageIcon(Index.class.getResource("/team/ecust/she/resource/image/uploadidlegoods.png")));
+		content.add(uploadIdleGoods);
+		
+		JButton uploadDemandGoods = new JButton("添加愿望");
+		uploadDemandGoods.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseEntered(MouseEvent e) {
+				uploadDemandGoods.setBackground(Colors.TOP_BAR_BACKGROUND.getColor());
+			}
+			@Override
+			public void mouseExited(MouseEvent e) {
+				uploadDemandGoods.setBackground(Colors.LEFT_CONTENT_BACKGROUND.getColor());
+			}
+		});
+		uploadDemandGoods.setBorder(null);
+		uploadDemandGoods.setFont(Fonts.LEFT_CONTENT_OPTION.getFont());
+		uploadDemandGoods.setBackground(Colors.LEFT_CONTENT_BACKGROUND.getColor());
+		uploadDemandGoods.setIcon(new ImageIcon(Index.class.getResource("/team/ecust/she/resource/image/uploaddemandgoods.png")));
+		content.add(uploadDemandGoods);
+		
+		JButton messages = new JButton("消息记录");
+		messages.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseEntered(MouseEvent e) {
+				messages.setBackground(Colors.TOP_BAR_BACKGROUND.getColor());
+			}
+			@Override
+			public void mouseExited(MouseEvent e) {
+				messages.setBackground(Colors.LEFT_CONTENT_BACKGROUND.getColor());
+			}
+		});
+		messages.setBorder(null);
+		messages.setFont(Fonts.LEFT_CONTENT_OPTION.getFont());
+		messages.setBackground(Colors.LEFT_CONTENT_BACKGROUND.getColor());
+		messages.setIcon(new ImageIcon(Index.class.getResource("/team/ecust/she/resource/image/messages.png")));
+		content.add(messages);
+		
+		JLabel goods = new JLabel("浏览物品");
+		goods.setFont(Fonts.LEFT_CONTENT_TITLE.getFont());
+		goods.setForeground(Colors.LEFT_CONTENT_TITLE_FOREGROUND.getColor());
+		content.add(goods);
+		
+		JButton books = new JButton("实体类书籍");
+		books.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseEntered(MouseEvent e) {
+				books.setBackground(Colors.TOP_BAR_BACKGROUND.getColor());
+			}
+			@Override
+			public void mouseExited(MouseEvent e) {
+				books.setBackground(Colors.LEFT_CONTENT_BACKGROUND.getColor());
+			}
+		});
+		books.setBorder(null);
+		books.setFont(Fonts.LEFT_CONTENT_OPTION.getFont());
+		books.setBackground(Colors.LEFT_CONTENT_BACKGROUND.getColor());
+		books.setIcon(new ImageIcon(Index.class.getResource("/team/ecust/she/resource/image/books.png")));
+		content.add(books);
+		
+		JButton devices = new JButton("电子类产品");
+		devices.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseEntered(MouseEvent e) {
+				devices.setBackground(Colors.TOP_BAR_BACKGROUND.getColor());
+			}
+			@Override
+			public void mouseExited(MouseEvent e) {
+				devices.setBackground(Colors.LEFT_CONTENT_BACKGROUND.getColor());
+			}
+		});
+		devices.setBorder(null);
+		devices.setFont(Fonts.LEFT_CONTENT_OPTION.getFont());
+		devices.setBackground(Colors.LEFT_CONTENT_BACKGROUND.getColor());
+		devices.setIcon(new ImageIcon(Index.class.getResource("/team/ecust/she/resource/image/devices.png")));
+		content.add(devices);
+		
+		JButton dailyuse = new JButton("生活类用品");
+		dailyuse.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseEntered(MouseEvent e) {
+				dailyuse.setBackground(Colors.TOP_BAR_BACKGROUND.getColor());
+			}
+			@Override
+			public void mouseExited(MouseEvent e) {
+				dailyuse.setBackground(Colors.LEFT_CONTENT_BACKGROUND.getColor());
+			}
+		});
+		dailyuse.setBorder(null);
+		dailyuse.setFont(Fonts.LEFT_CONTENT_OPTION.getFont());
+		dailyuse.setBackground(Colors.LEFT_CONTENT_BACKGROUND.getColor());
+		dailyuse.setIcon(new ImageIcon(Index.class.getResource("/team/ecust/she/resource/image/dailyuse.png")));
+		content.add(dailyuse);
+		
+		JButton foods = new JButton("美食一条街");
+		foods.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseEntered(MouseEvent e) {
+				foods.setBackground(Colors.TOP_BAR_BACKGROUND.getColor());
+			}
+			@Override
+			public void mouseExited(MouseEvent e) {
+				foods.setBackground(Colors.LEFT_CONTENT_BACKGROUND.getColor());
+			}
+		});
+		foods.setBorder(null);
+		foods.setFont(Fonts.LEFT_CONTENT_OPTION.getFont());
+		foods.setBackground(Colors.LEFT_CONTENT_BACKGROUND.getColor());
+		foods.setIcon(new ImageIcon(Index.class.getResource("/team/ecust/she/resource/image/foods.png")));
+		content.add(foods);
+		
+		JButton souvenir = new JButton("纪念装饰品");
+		souvenir.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseEntered(MouseEvent e) {
+				souvenir.setBackground(Colors.TOP_BAR_BACKGROUND.getColor());
+			}
+			@Override
+			public void mouseExited(MouseEvent e) {
+				souvenir.setBackground(Colors.LEFT_CONTENT_BACKGROUND.getColor());
+			}
+		});
+		souvenir.setBorder(null);
+		souvenir.setFont(Fonts.LEFT_CONTENT_OPTION.getFont());
+		souvenir.setBackground(Colors.LEFT_CONTENT_BACKGROUND.getColor());
+		souvenir.setIcon(new ImageIcon(Index.class.getResource("/team/ecust/she/resource/image/souvenir.png")));
+		content.add(souvenir);
+		
+		JButton tools = new JButton("百宝箱工具");
+		tools.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseEntered(MouseEvent e) {
+				tools.setBackground(Colors.TOP_BAR_BACKGROUND.getColor());
+			}
+			@Override
+			public void mouseExited(MouseEvent e) {
+				tools.setBackground(Colors.LEFT_CONTENT_BACKGROUND.getColor());
+			}
+		});
+		tools.setBorder(null);
+		tools.setFont(Fonts.LEFT_CONTENT_OPTION.getFont());
+		tools.setBackground(Colors.LEFT_CONTENT_BACKGROUND.getColor());
+		tools.setIcon(new ImageIcon(Index.class.getResource("/team/ecust/she/resource/image/tools.png")));
+		content.add(tools);
+		
+		JButton others = new JButton("其他物品");
+		others.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseEntered(MouseEvent e) {
+				others.setBackground(Colors.TOP_BAR_BACKGROUND.getColor());
+			}
+			@Override
+			public void mouseExited(MouseEvent e) {
+				others.setBackground(Colors.LEFT_CONTENT_BACKGROUND.getColor());
+			}
+		});
+		others.setBorder(null);
+		others.setFont(Fonts.LEFT_CONTENT_OPTION.getFont());
+		others.setBackground(Colors.LEFT_CONTENT_BACKGROUND.getColor());
+		others.setIcon(new ImageIcon(Index.class.getResource("/team/ecust/she/resource/image/others.png")));
+		content.add(others);
+		
+		JButton wishwall = new JButton("心愿墙");
+		wishwall.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseEntered(MouseEvent e) {
+				wishwall.setBackground(Colors.TOP_BAR_BACKGROUND.getColor());
+			}
+			@Override
+			public void mouseExited(MouseEvent e) {
+				wishwall.setBackground(Colors.LEFT_CONTENT_BACKGROUND.getColor());
+			}
+		});
+		wishwall.setBorder(null);
+		wishwall.setFont(Fonts.LEFT_CONTENT_OPTION.getFont());
+		wishwall.setBackground(Colors.LEFT_CONTENT_BACKGROUND.getColor());
+		wishwall.setIcon(new ImageIcon(Index.class.getResource("/team/ecust/she/resource/image/wishwall.png")));
+		content.add(wishwall);
+		
+		JLabel settings = new JLabel("设置");
+		settings.setFont(Fonts.LEFT_CONTENT_TITLE.getFont());
+		settings.setForeground(Colors.LEFT_CONTENT_TITLE_FOREGROUND.getColor());
+		content.add(settings);
+		
+		JButton permission = new JButton("权限设置");
+		permission.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseEntered(MouseEvent e) {
+				permission.setBackground(Colors.TOP_BAR_BACKGROUND.getColor());
+			}
+			@Override
+			public void mouseExited(MouseEvent e) {
+				permission.setBackground(Colors.LEFT_CONTENT_BACKGROUND.getColor());
+			}
+		});
+		permission.setBorder(null);
+		permission.setFont(Fonts.LEFT_CONTENT_OPTION.getFont());
+		permission.setBackground(Colors.LEFT_CONTENT_BACKGROUND.getColor());
+		permission.setIcon(new ImageIcon(Index.class.getResource("/team/ecust/she/resource/image/permission.png")));
+		content.add(permission);
+		
+		JButton software = new JButton("软件设置");
+		software.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseEntered(MouseEvent e) {
+				software.setBackground(Colors.TOP_BAR_BACKGROUND.getColor());
+			}
+			@Override
+			public void mouseExited(MouseEvent e) {
+				software.setBackground(Colors.LEFT_CONTENT_BACKGROUND.getColor());
+			}
+		});
+		software.setBorder(null);
+		software.setFont(Fonts.LEFT_CONTENT_OPTION.getFont());
+		software.setBackground(Colors.LEFT_CONTENT_BACKGROUND.getColor());
+		software.setIcon(new ImageIcon(Index.class.getResource("/team/ecust/she/resource/image/software.png")));
+		content.add(software);
+		
+		JButton softinfo = new JButton("关于我们");
+		softinfo.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseEntered(MouseEvent e) {
+				softinfo.setBackground(Colors.TOP_BAR_BACKGROUND.getColor());
+			}
+			@Override
+			public void mouseExited(MouseEvent e) {
+				softinfo.setBackground(Colors.LEFT_CONTENT_BACKGROUND.getColor());
+			}
+		});
+		softinfo.setBorder(null);
+		softinfo.setFont(Fonts.LEFT_CONTENT_OPTION.getFont());
+		softinfo.setBackground(Colors.LEFT_CONTENT_BACKGROUND.getColor());
+		softinfo.setIcon(new ImageIcon(Index.class.getResource("/team/ecust/she/resource/image/softinfo.png")));
+		content.add(softinfo);
+	}
+	
+	/**加载卡片内容。*/
+	private void loadCard() {
+		card = new JPanel();
+		frame.getContentPane().add(card, BorderLayout.CENTER);
+		card.setLayout(new CardLayout());
 	}
 	
 	/**
 	 * 设置顶栏的头像面板。
-	 * 使用Toolkit.getDefaultToolkit().getImage()方法，文件名必须以src开头
-	 * @param icon 需要设置的图标对象
+	 * 使用Toolkit.getDefaultToolkit().getImage()方法，文件路径必须以src开头
+	 * @param image 需要设置的图标对象
 	 */
 	public void setHeadPortrait(Image image) {
 		headPortrait.setPhoto(image);
 	}
 	
 	/**
+	 * 获取顶栏的头像对象。
+	 * @return 头像对应的图像对象
+	 */
+	public Image getHeadPortrait() {
+		return headPortrait.getPhoto();
+	}
+	
+	/**显示高清头像。*/
+	private void showHeadPortraitInCard() {
+		Photo photo = new Photo(getHeadPortrait());
+		photo.setScaleFunction(true);//增加缩放功能
+		photo.setRecoverFunction(true);//增加双击复原功能
+		photo.setDragFunction(true);//增加拖拽功能
+		photo.setBackground(Colors.TOP_BAR_HEAD_PORTRAIT_BACKGROUND.getColor());
+		JPanel panel = new JPanel(new BorderLayout());
+		panel.setBackground(Colors.TOP_BAR_HEAD_PORTRAIT_BACKGROUND.getColor());
+		panel.add(photo, BorderLayout.CENTER);
+		showInCard(panel);
+		int width = photo.getWidth();
+		int height = photo.getHeight();
+		if(width >= height) {//调整为正方形
+			panel.setBorder(new EmptyBorder(0, (width - height)/2, 0, (width - height)/2));
+		} else {
+			panel.setBorder(new EmptyBorder((height - width)/2, 0,  (height - width)/2, 0));
+		}
+	}
+	
+	
+	/**
 	 * 设置顶栏的昵称文字，如果字符串长度超过5，只显示前四个字符，用三个.隐藏后半部分。
-	 * @param name 需要设置的名字字符串
+	 * @param name 需要显示的名字字符串
 	 */
 	public void setNickname(String name) {
 		StringBuffer buffer = new StringBuffer(name);
@@ -281,5 +671,49 @@ public final class Index {
 			buffer.append("...");
 		}
 		nickname.setText(buffer.toString());
+	}
+	
+	/**
+	 * 获取检索的信息。
+	 * @return 搜索框内的字符串
+	 */
+	public String getSearchContent() {
+		return search.getText();
+	}
+	
+	/**
+	 * 将参数对应的组件添加到首页的中心卡片中，并自动作为最上层显示。
+	 * @param component 需要添加到中心卡片显示的组件，为空啥也不做
+	 */
+	public void showInCard(Component component) {
+		if(component != null) {
+			card.add(component);
+			CardLayout layout = (CardLayout)card.getLayout();
+			layout.last(card);
+		}
+	}
+	
+	/**跳转至下一张卡片，如果是最后一张，将跳到第一张。*/
+	public void nextCard() {
+		CardLayout layout = (CardLayout)card.getLayout();
+		layout.next(card);
+	}
+	
+	/**跳转至上一张卡片，如果是第一张，将跳到最后一张。*/
+	public void previousCard() {
+		CardLayout layout = (CardLayout)card.getLayout();
+		layout.previous(card);
+	}
+	
+	/**跳转至第一张卡片。*/
+	public void firstCard() {
+		CardLayout layout = (CardLayout)card.getLayout();
+		layout.first(card);
+	}
+	
+	/**跳转至最后一张卡片。*/
+	public void lastCard() {
+		CardLayout layout = (CardLayout)card.getLayout();
+		layout.last(card);
 	}
 }

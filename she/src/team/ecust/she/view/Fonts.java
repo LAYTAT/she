@@ -10,8 +10,19 @@ public enum Fonts {
 	/**顶栏标题的字体*/
 	SHE_TITLE(new Font("黑体", Font.PLAIN, 28)),
 	
+	/**顶栏查询部分的字体*/
+	TOP_BAR_SEARCH(new Font("微软雅黑", Font.PLAIN, 18)),
+	
 	/**顶栏昵称的字体*/
 	TOP_BAR_NICKNAME(new Font("宋体", Font.PLAIN, 20)),
+	
+	/**左栏目录标题的字体*/
+	LEFT_CONTENT_TITLE(new Font("微软雅黑", Font.BOLD, 22)),
+	
+	/**左栏目录选项的字体*/
+	LEFT_CONTENT_OPTION(new Font("黑体", Font.PLAIN, 20)),
+	
+	/***/
 	
 	;
 	
@@ -32,5 +43,14 @@ public enum Fonts {
 	 */
 	public Font getFont() {
 		return font;
+	}
+	
+	/**
+	 * 获取枚举的字体对象的大小。
+	 * @return 对应字体的大小
+	 */
+	public int getSize()
+	{
+		return font.getSize();
 	}
 }
