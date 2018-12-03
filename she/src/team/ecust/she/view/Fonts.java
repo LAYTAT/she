@@ -8,22 +8,29 @@ public enum Fonts {
 	PROMPT_BOX(new Font("微软雅黑", Font.BOLD, 30)),
 	
 	/**顶栏标题的字体*/
-	SHE_TITLE(new Font("黑体", Font.PLAIN, 28)),
-	
+	TOP_BAR_TITLE(new Font("黑体", Font.PLAIN, 28)),
+	/**顶栏切换部分的字体*/
+	TOP_BAR_SWITCH(new Font("黑体", Font.BOLD, 24)),
 	/**顶栏查询部分的字体*/
 	TOP_BAR_SEARCH(new Font("微软雅黑", Font.PLAIN, 18)),
-	
 	/**顶栏昵称的字体*/
-	TOP_BAR_NICKNAME(new Font("宋体", Font.PLAIN, 20)),
+	TOP_BAR_NICKNAME(new Font("等线", Font.PLAIN, 20)),
 	
 	/**左栏目录标题的字体*/
 	LEFT_CONTENT_TITLE(new Font("微软雅黑", Font.BOLD, 22)),
-	
 	/**左栏目录选项的字体*/
 	LEFT_CONTENT_OPTION(new Font("黑体", Font.PLAIN, 20)),
 	
-	/***/
-	
+	/**我的信息界面标题（即昵称对应的一行）的字体*/
+	MINE_INFO_TITLE(new Font("微软雅黑", Font.PLAIN, 22)),
+	/**我的信息界面标题（即昵称对应的一行）的字体*/
+	MINE_INFO_DETAILS(new Font("等线", Font.PLAIN, 20)),
+	/**我的信息界面个人说明的字体*/
+	MINE_INFO_STATEMENT(new Font("宋体", Font.PLAIN, 20)),
+	/**我的信息界面个人说明面板标题的字体*/
+	MINE_INFO_STATEMENT_TITLE(new Font("黑体", Font.PLAIN, 16)),
+	/**我的信息界面选项面板的字体*/
+	MINE_INFO_OPTIONS(new Font("黑体", Font.PLAIN, 20)),
 	;
 	
 	/**枚举的字体变量*/

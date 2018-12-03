@@ -21,6 +21,8 @@ import com.wis.pack.component.Photo;
 
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.awt.FlowLayout;
 import java.awt.GridLayout;
 import java.awt.Image;
@@ -31,17 +33,33 @@ import javax.swing.JButton;
 import javax.swing.JScrollPane;
 import java.awt.CardLayout;
 import java.awt.Component;
+import javax.swing.border.MatteBorder;
 
 /**首页界面类，也是窗口的整体框架，包含主函数。*/
 public final class Index {
 	/**设备屏幕的最大宽度*/
-	public final static int SCREEN_WIDTH  = 1920;//Toolkit.getDefaultToolkit().getScreenSize().width;
+	public final static int SCREEN_WIDTH  = Toolkit.getDefaultToolkit().getScreenSize().width;
 	/**设备屏幕的最大高度*/
-	public final static int SCREEN_HEIGHT = 1080;//Toolkit.getDefaultToolkit().getScreenSize().height;
+	public final static int SCREEN_HEIGHT = Toolkit.getDefaultToolkit().getScreenSize().height;
 	
-	/**消息已读未读状态*/
-	public static boolean READ_MESSAGE;
+	/**用于保存对象的实例*/
+	private static Index INDEX = null;
 	
+	/**获取首页的实例对象。*/
+	public static Index getInstance() {
+		if(INDEX == null)
+			INDEX = new Index();
+		return INDEX;
+	}
+	
+	/**当前皮肤对应的数字标识符，默认为零*/
+	private int type;
+	/**当前皮肤的颜色，默认为标准背景色*/
+	private Colors colors;
+	/**消息已读未读状态，默认为已读*/
+	private boolean readMessage;
+	/**登录会员的号码，默认为空串，代表未登录*/
+	private String memberNo;
 	/**窗体对象*/
 	private JFrame frame;
 	/**搜索文本框*/
@@ -61,7 +79,7 @@ public final class Index {
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				try {
-					Index window = new Index();
+					Index window = getInstance();
 					window.frame.setVisible(true);
 				} catch (Exception e) {
 					(new PromptBox(Tips.ERROR)).open("软件异常退出");
@@ -70,47 +88,82 @@ public final class Index {
 		});
 	}
 
-	/**加载首页对象。 */
-	public Index() {
-		READ_MESSAGE = true;
+	/**初始化各项参数并加载显示首页对象，背景色默认为顶栏标准背景色，消息默认为已读，会员号码默认为空串。 */
+	private Index() {
+		type = 0;
+		colors = Colors.TOP_BAR_BACKGROUND;
+		readMessage = true;
+		memberNo = "";
 		initialize();
+		readMessagesFromDataBase(1000);
 	}
 
 	/**初始化首页界面内容。*/
 	private void initialize() {
 		frame = new JFrame();
-		//测试完毕删除
-			frame.setSize(SCREEN_WIDTH, SCREEN_HEIGHT);
-		//........
 		frame.setUndecorated(true);//去除原始顶栏
-		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);//设置系统退出方式
 		frame.setExtendedState(frame.getState() | JFrame.MAXIMIZED_BOTH);//最大化启动
 		frame.setIconImage(Toolkit.getDefaultToolkit().getImage(Index.class.getResource("/team/ecust/she/resource/image/window.png")));//设置任务栏图标
 		loadTopBar();
 		loadContent();
-		loadCard();
+		card = new JPanel();//加载卡片内容
+		frame.getContentPane().add(card, BorderLayout.CENTER);
+		card.setLayout(new CardLayout());
 	}
 	
 	/**加载顶栏内容。*/
 	private void loadTopBar() {
 		JPanel topBar = new JPanel();
-		topBar.setBackground(Colors.TOP_BAR_BACKGROUND.getColor());
+		topBar.setBackground(colors.getColor());
 		frame.getContentPane().add(topBar, BorderLayout.NORTH);
 		
 		FlowLayout topBarLayout = (FlowLayout) topBar.getLayout();//设置顶栏布局
-		topBarLayout.setHgap(20);//水平间距width
+		topBarLayout.setHgap(20);//组件的水平间距width
 		topBarLayout.setVgap(12);//设置顶栏的上下边界高度
 		
 		JLabel topBarTitle = new JLabel("华理二手物品交易平台");
-		topBarTitle.setFont(Fonts.SHE_TITLE.getFont());
-		topBarTitle.setForeground(Colors.SHE_TILTLE_FOREGROUND.getColor());
+		topBarTitle.setFont(Fonts.TOP_BAR_TITLE.getFont());
+		topBarTitle.setForeground(Colors.TOP_BAR_TILTLE_FOREGROUND.getColor());
 		topBarTitle.setIcon(new ImageIcon(Index.class.getResource("/team/ecust/she/resource/image/logo.png")));
 		topBar.add(topBarTitle);//-width-title.length(10)
 		
+		JPanel switchTo = new JPanel(new GridLayout(0, 2, 0, 0));//切换卡片的面板，并设置边界
+		switchTo.setBorder(new EmptyBorder(0, 20, 0, 0));//拉大左边界间距
+		switchTo.setBackground(colors.getColor());
+		topBar.add(switchTo);//-width-20
+		
+		JButton previous = new JButton("<");//前一页按钮
+		previous.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				previousCard();
+			}
+		});
+		previous.setBorder(new LineBorder(colors.getColor().darker(), 1));
+		previous.setPreferredSize(new Dimension(50, 28));
+		previous.setBackground(colors.getColor());
+		previous.setForeground(Colors.TOP_BAR_SWITCH_FOREGROUND.getColor());
+		previous.setFont(Fonts.TOP_BAR_SWITCH.getFont());
+		switchTo.add(previous);//-50
+		
+		JButton next = new JButton(">");//下一页按钮
+		next.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				nextCard();
+			}
+		});
+		next.setBorder(new LineBorder(colors.getColor().darker(), 1));
+		next.setPreferredSize(new Dimension(50, 28));
+		next.setBackground(colors.getColor());
+		next.setForeground(Colors.TOP_BAR_SWITCH_FOREGROUND.getColor());
+		next.setFont(Fonts.TOP_BAR_SWITCH.getFont());
+		switchTo.add(next);//-50
+		
 		JPanel input = new JPanel();//查询部分的面板
-		input.setBorder(new EmptyBorder(0, 100, 0, 0));
-		input.setBackground(Colors.TOP_BAR_BACKGROUND.getColor());
-		topBar.add(input);//-width-100
+		input.setBackground(colors.getColor());
+		topBar.add(input);//-width
 		
 		FlowLayout inputLayout = (FlowLayout) input.getLayout();//设置查询部分的布局
 		inputLayout.setVgap(0);//紧密贴合
@@ -120,7 +173,7 @@ public final class Index {
 		search.setBorder(null);
 		search.setPreferredSize(new Dimension(240, 28));//适应大小
 		search.setFont(Fonts.TOP_BAR_SEARCH.getFont());
-		search.setBackground(Colors.TOP_BAR_SEARCH_BACKGROUND.getColor());
+		search.setBackground(colors.getColor().darker());
 		search.setForeground(Colors.TOP_BAR_SEARCH_FOREGROUND.getColor());
 		input.add(search);//-240
 		
@@ -138,15 +191,15 @@ public final class Index {
 		query.setBorder(null);
 		query.setPreferredSize(new Dimension(70, 28));
 		query.setFont(Fonts.TOP_BAR_SEARCH.getFont());
-		query.setBackground(Colors.TOP_BAR_SEARCH_BACKGROUND.getColor());
+		query.setBackground(colors.getColor().darker());
 		query.setForeground(Colors.TOP_BAR_SEARCH_FOREGROUND.getColor());
 		input.add(query);//-70
 		
-		//公式：SCREEN_WIDTH - 14*width - 528 - 1.2*10*title.size - 1.2*5*nickname.size//中文=1.2*英文
-		int fitWidth = SCREEN_WIDTH - 848 - 12*Fonts.SHE_TITLE.getSize() - 6*Fonts.TOP_BAR_NICKNAME.getSize();
+		//公式：SCREEN_WIDTH - 15*width + adjust - 548 - 1.2*10*title.size - 1.2*5*nickname.size//adjust=80微调//中文=1.2*英文
+		int fitWidth = SCREEN_WIDTH - 808 - 12*Fonts.TOP_BAR_TITLE.getSize() - 6*Fonts.TOP_BAR_NICKNAME.getSize();
 		JPanel blank = new JPanel();
 		blank.setPreferredSize(new Dimension(fitWidth, 10));//设置占位面板的最佳宽度
-		blank.setBackground(Colors.TOP_BAR_BACKGROUND.getColor());
+		blank.setBackground(colors.getColor());
 		topBar.add(blank);//-width
 		
 		headPortrait = new Photo("src/team/ecust/she/resource/image/unknown.jpg");
@@ -154,12 +207,12 @@ public final class Index {
 			@Override
 			public void mouseEntered(MouseEvent e) {
 				headPortrait.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-				headPortrait.setBorder(new LineBorder(Colors.TOP_BAR_HEAD_PORTRAIT_BORDER.getColor(), 2));
+				headPortrait.setBorder(new LineBorder(colors.getColor().brighter(), 2));
 			}
 			@Override
 			public void mouseExited(MouseEvent e) {
 				headPortrait.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
-				headPortrait.setBorder(new LineBorder(Colors.TOP_BAR_BACKGROUND.getColor(), 2));
+				headPortrait.setBorder(new LineBorder(colors.getColor(), 2));
 			}
 			@Override
 			public void mouseClicked(MouseEvent e) {
@@ -169,8 +222,8 @@ public final class Index {
 		headPortrait.setPhotoLocation(2, 2);
 		headPortrait.setRatio(90);//设置图片相对面板的缩放比例
 		headPortrait.setPreferredSize(new Dimension(36, 36));//强制头像的大小，实际大小要减边界宽度
-		headPortrait.setBorder(new LineBorder(Colors.TOP_BAR_BACKGROUND.getColor(), 2));
-		headPortrait.setBackground(Colors.TOP_BAR_BACKGROUND.getColor());
+		headPortrait.setBorder(new LineBorder(colors.getColor(), 2));
+		headPortrait.setBackground(colors.getColor());
 		topBar.add(headPortrait);//-width-36
 		
 		nickname = new JLabel("未登录...");
@@ -207,6 +260,36 @@ public final class Index {
 				frame.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
 				appearance.setIcon(new ImageIcon(Index.class.getResource("/team/ecust/she/resource/image/severance_o.png")));
 			}
+			@Override
+			public void mouseClicked(MouseEvent e) {//个性在线换肤
+				if(++type > 5)
+					type = 0;
+				switch(type) {
+				case 0:
+					colors = Colors.TOP_BAR_BACKGROUND; break;
+				case 1:
+					colors = Colors.TOP_BAR_BACKGROUND_RED; break;
+				case 2:
+					colors = Colors.TOP_BAR_BACKGROUND_GRAY; break;
+				case 3:
+					colors = Colors.TOP_BAR_BACKGROUND_GREEN; break;
+				case 4:
+					colors = Colors.TOP_BAR_BACKGROUND_ORANGE; break;
+				case 5:
+					colors = Colors.TOP_BAR_BACKGROUND_PINK; break;
+				default:break;
+				}
+				topBar.setBackground(colors.getColor());//更新各个背景色
+				switchTo.setBackground(colors.getColor());
+				previous.setBackground(colors.getColor());
+				previous.setBorder(new LineBorder(colors.getColor().darker(), 1));
+				next.setBackground(colors.getColor());
+				next.setBorder(new LineBorder(colors.getColor().darker(), 1));
+				search.setBackground(colors.getColor().darker());
+				query.setBackground(colors.getColor().darker());
+				blank.setBackground(colors.getColor());
+				headPortrait.setBorder(new LineBorder(colors.getColor(), 2));
+			}
 		});
 		appearance.setIcon(new ImageIcon(Index.class.getResource("/team/ecust/she/resource/image/severance_o.png")));
 		topBar.add(appearance);//-width-20
@@ -216,7 +299,7 @@ public final class Index {
 			@Override
 			public void mouseEntered(MouseEvent e) {
 				frame.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-				if(READ_MESSAGE)
+				if(readMessage)
 					messages.setIcon(new ImageIcon(Index.class.getResource("/team/ecust/she/resource/image/messages_i.png")));
 				else
 					messages.setIcon(new ImageIcon(Index.class.getResource("/team/ecust/she/resource/image/messages_ui.png")));
@@ -224,7 +307,7 @@ public final class Index {
 			@Override
 			public void mouseExited(MouseEvent e) {
 				frame.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
-				if(READ_MESSAGE)
+				if(readMessage)
 					messages.setIcon(new ImageIcon(Index.class.getResource("/team/ecust/she/resource/image/messages_o.png")));
 				else
 					messages.setIcon(new ImageIcon(Index.class.getResource("/team/ecust/she/resource/image/messages_uo.png")));
@@ -286,6 +369,18 @@ public final class Index {
 				frame.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
 				maximum.setIcon(new ImageIcon(Index.class.getResource("/team/ecust/she/resource/image/maximum_fo.png")));
 			}
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				/*
+				int width = frame.getWidth();
+				if(width != SCREEN_WIDTH) {
+					blank.setPreferredSize(new Dimension(blank.getWidth()+width/3, 10));
+					frame.setExtendedState(frame.getState() | JFrame.MAXIMIZED_BOTH);
+				} else {
+					blank.setPreferredSize(new Dimension(blank.getWidth()-width/3, 10));
+					frame.setBounds(100, 100, 2*width/3, 2*frame.getHeight()/3);
+				}*/
+			}
 		});
 		maximum.setIcon(new ImageIcon(Index.class.getResource("/team/ecust/she/resource/image/maximum_fo.png")));
 		topBar.add(maximum);//-width-20
@@ -312,9 +407,9 @@ public final class Index {
 		topBar.add(close);//-width-20-width
 	}
 	
-	/**加载目录内容。*/
+	/**加载目录内容，不要尝试模块化提高代码重用率，会出错。*/
 	private void loadContent() {
-		JPanel content = new JPanel(new GridLayout(20, 0, 0, 0));//根据实际情况调整目录行数和竖直间距
+		JPanel content = new JPanel(new GridLayout(22, 0, 0, 0));//根据实际情况调整目录行数和竖直间距
 		content.setBorder(new EmptyBorder(10, 10, 0, 20));//设置左右边界宽度
 		content.setBackground(Colors.LEFT_CONTENT_BACKGROUND.getColor());
 		
@@ -323,8 +418,8 @@ public final class Index {
 		scrollPane.setPreferredSize(new Dimension(300, 100));//设置滚动面板宽度，高度自适应
 		frame.getContentPane().add(scrollPane, BorderLayout.WEST);
 		
-		JLabel mine = new JLabel("我的账户");
-		//mine.setBorder(new LineBorder(Colors.TOP_BAR_BACKGROUND.getColor(), 1));
+		JLabel mine = new JLabel(" 我的账户");
+		mine.setBorder(new MatteBorder(0, 10, 0, 0, Colors.LEFT_CONTENT_TITLE_FOREGROUND.getColor()));
 		mine.setFont(Fonts.LEFT_CONTENT_TITLE.getFont());
 		mine.setForeground(Colors.LEFT_CONTENT_TITLE_FOREGROUND.getColor());
 		content.add(mine);
@@ -339,6 +434,13 @@ public final class Index {
 			public void mouseExited(MouseEvent e) {
 				myInfo.setBackground(Colors.LEFT_CONTENT_BACKGROUND.getColor());
 			}
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				(new PromptBox()).open("请登录");
+				Login login = new Login();
+				showInCard(login);
+				login.display();
+			}
 		});
 		myInfo.setBorder(null);
 		myInfo.setFont(Fonts.LEFT_CONTENT_OPTION.getFont());
@@ -346,7 +448,7 @@ public final class Index {
 		myInfo.setIcon(new ImageIcon(Index.class.getResource("/team/ecust/she/resource/image/myinfo.png")));
 		content.add(myInfo);
 		
-		JButton modifyInfo = new JButton("修改信息");
+		JButton modifyInfo = new JButton("编辑信息");
 		modifyInfo.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseEntered(MouseEvent e) {
@@ -355,6 +457,11 @@ public final class Index {
 			@Override
 			public void mouseExited(MouseEvent e) {
 				modifyInfo.setBackground(Colors.LEFT_CONTENT_BACKGROUND.getColor());
+			}
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				SoftwareInfo info = new SoftwareInfo();
+				showInCard(info);
 			}
 		});
 		modifyInfo.setBorder(null);
@@ -414,10 +521,68 @@ public final class Index {
 		messages.setIcon(new ImageIcon(Index.class.getResource("/team/ecust/she/resource/image/messages.png")));
 		content.add(messages);
 		
-		JLabel goods = new JLabel("浏览物品");
-		goods.setFont(Fonts.LEFT_CONTENT_TITLE.getFont());
-		goods.setForeground(Colors.LEFT_CONTENT_TITLE_FOREGROUND.getColor());
-		content.add(goods);
+		JLabel recommand = new JLabel(" 推荐内容");
+		recommand.setBorder(new MatteBorder(0, 10, 0, 0, Colors.LEFT_CONTENT_TITLE_FOREGROUND.getColor()));
+		recommand.setFont(Fonts.LEFT_CONTENT_TITLE.getFont());
+		recommand.setForeground(Colors.LEFT_CONTENT_TITLE_FOREGROUND.getColor());
+		content.add(recommand);
+		
+		JButton hotsale = new JButton("热卖物品");
+		hotsale.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseEntered(MouseEvent e) {
+				hotsale.setBackground(Colors.TOP_BAR_BACKGROUND.getColor());
+			}
+			@Override
+			public void mouseExited(MouseEvent e) {
+				hotsale.setBackground(Colors.LEFT_CONTENT_BACKGROUND.getColor());
+			}
+		});
+		hotsale.setBorder(null);
+		hotsale.setFont(Fonts.LEFT_CONTENT_OPTION.getFont());
+		hotsale.setBackground(Colors.LEFT_CONTENT_BACKGROUND.getColor());
+		hotsale.setIcon(new ImageIcon(Index.class.getResource("/team/ecust/she/resource/image/hotsale.png")));
+		content.add(hotsale);
+		
+		JButton latest = new JButton("最近更新");
+		latest.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseEntered(MouseEvent e) {
+				latest.setBackground(Colors.TOP_BAR_BACKGROUND.getColor());
+			}
+			@Override
+			public void mouseExited(MouseEvent e) {
+				latest.setBackground(Colors.LEFT_CONTENT_BACKGROUND.getColor());
+			}
+		});
+		latest.setBorder(null);
+		latest.setFont(Fonts.LEFT_CONTENT_OPTION.getFont());
+		latest.setBackground(Colors.LEFT_CONTENT_BACKGROUND.getColor());
+		latest.setIcon(new ImageIcon(Index.class.getResource("/team/ecust/she/resource/image/latest.png")));
+		content.add(latest);
+		
+		JButton wishwall = new JButton("心愿墙");
+		wishwall.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseEntered(MouseEvent e) {
+				wishwall.setBackground(Colors.TOP_BAR_BACKGROUND.getColor());
+			}
+			@Override
+			public void mouseExited(MouseEvent e) {
+				wishwall.setBackground(Colors.LEFT_CONTENT_BACKGROUND.getColor());
+			}
+		});
+		wishwall.setBorder(null);
+		wishwall.setFont(Fonts.LEFT_CONTENT_OPTION.getFont());
+		wishwall.setBackground(Colors.LEFT_CONTENT_BACKGROUND.getColor());
+		wishwall.setIcon(new ImageIcon(Index.class.getResource("/team/ecust/she/resource/image/wishwall.png")));
+		content.add(wishwall);
+
+		JLabel variety = new JLabel(" 分类浏览");
+		variety.setBorder(new MatteBorder(0, 10, 0, 0, Colors.LEFT_CONTENT_TITLE_FOREGROUND.getColor()));
+		variety.setFont(Fonts.LEFT_CONTENT_TITLE.getFont());
+		variety.setForeground(Colors.LEFT_CONTENT_TITLE_FOREGROUND.getColor());
+		content.add(variety);
 		
 		JButton books = new JButton("实体类书籍");
 		books.addMouseListener(new MouseAdapter() {
@@ -538,24 +703,8 @@ public final class Index {
 		others.setIcon(new ImageIcon(Index.class.getResource("/team/ecust/she/resource/image/others.png")));
 		content.add(others);
 		
-		JButton wishwall = new JButton("心愿墙");
-		wishwall.addMouseListener(new MouseAdapter() {
-			@Override
-			public void mouseEntered(MouseEvent e) {
-				wishwall.setBackground(Colors.TOP_BAR_BACKGROUND.getColor());
-			}
-			@Override
-			public void mouseExited(MouseEvent e) {
-				wishwall.setBackground(Colors.LEFT_CONTENT_BACKGROUND.getColor());
-			}
-		});
-		wishwall.setBorder(null);
-		wishwall.setFont(Fonts.LEFT_CONTENT_OPTION.getFont());
-		wishwall.setBackground(Colors.LEFT_CONTENT_BACKGROUND.getColor());
-		wishwall.setIcon(new ImageIcon(Index.class.getResource("/team/ecust/she/resource/image/wishwall.png")));
-		content.add(wishwall);
-		
-		JLabel settings = new JLabel("设置");
+		JLabel settings = new JLabel(" 设置");
+		settings.setBorder(new MatteBorder(0, 10, 0, 0, Colors.LEFT_CONTENT_TITLE_FOREGROUND.getColor()));
 		settings.setFont(Fonts.LEFT_CONTENT_TITLE.getFont());
 		settings.setForeground(Colors.LEFT_CONTENT_TITLE_FOREGROUND.getColor());
 		content.add(settings);
@@ -604,6 +753,12 @@ public final class Index {
 			public void mouseExited(MouseEvent e) {
 				softinfo.setBackground(Colors.LEFT_CONTENT_BACKGROUND.getColor());
 			}
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				SoftwareInfo info = new SoftwareInfo();
+				showInCard(info);
+				info.display();
+			}
 		});
 		softinfo.setBorder(null);
 		softinfo.setFont(Fonts.LEFT_CONTENT_OPTION.getFont());
@@ -612,11 +767,39 @@ public final class Index {
 		content.add(softinfo);
 	}
 	
-	/**加载卡片内容。*/
-	private void loadCard() {
-		card = new JPanel();
-		frame.getContentPane().add(card, BorderLayout.CENTER);
-		card.setLayout(new CardLayout());
+	/**
+	 * 每隔一段时间从数据库读取消息，并处理。
+	 * @param duration 间隔时间，单位为毫秒
+	 */
+	private void readMessagesFromDataBase(int duration) {
+		(new Timer()).schedule(new TimerTask() {
+			@Override
+			public void run() {
+				
+			}
+		}, 2000);
+	}
+	
+	/**显示高清头像。*/
+	private void showHeadPortraitInCard() {
+		Photo photo = new Photo(getHeadPortrait());
+		photo.setScaleFunction(true);//增加缩放功能
+		photo.setRecoverFunction(true);//增加双击复原功能
+		photo.setDragFunction(true);//增加拖拽功能
+		photo.setBackground(Colors.CENTER_CARD_BACKGROUND.getColor());
+		
+		JPanel panel = new JPanel(new BorderLayout());//用另外的面板限制照片大小和位置
+		panel.setBackground(Colors.CENTER_CARD_BACKGROUND.getColor());
+		panel.add(photo, BorderLayout.CENTER);
+		showInCard(panel);
+		
+		int width = photo.getWidth();
+		int height = photo.getHeight();
+		if(width >= height) {//调整为正方形
+			panel.setBorder(new EmptyBorder(0, (width - height)/2, 0, (width - height)/2));
+		} else {
+			panel.setBorder(new EmptyBorder((height - width)/2, 0,  (height - width)/2, 0));
+		}
 	}
 	
 	/**
@@ -635,27 +818,6 @@ public final class Index {
 	public Image getHeadPortrait() {
 		return headPortrait.getPhoto();
 	}
-	
-	/**显示高清头像。*/
-	private void showHeadPortraitInCard() {
-		Photo photo = new Photo(getHeadPortrait());
-		photo.setScaleFunction(true);//增加缩放功能
-		photo.setRecoverFunction(true);//增加双击复原功能
-		photo.setDragFunction(true);//增加拖拽功能
-		photo.setBackground(Colors.TOP_BAR_HEAD_PORTRAIT_BACKGROUND.getColor());
-		JPanel panel = new JPanel(new BorderLayout());
-		panel.setBackground(Colors.TOP_BAR_HEAD_PORTRAIT_BACKGROUND.getColor());
-		panel.add(photo, BorderLayout.CENTER);
-		showInCard(panel);
-		int width = photo.getWidth();
-		int height = photo.getHeight();
-		if(width >= height) {//调整为正方形
-			panel.setBorder(new EmptyBorder(0, (width - height)/2, 0, (width - height)/2));
-		} else {
-			panel.setBorder(new EmptyBorder((height - width)/2, 0,  (height - width)/2, 0));
-		}
-	}
-	
 	
 	/**
 	 * 设置顶栏的昵称文字，如果字符串长度超过5，只显示前四个字符，用三个.隐藏后半部分。
@@ -715,5 +877,37 @@ public final class Index {
 	public void lastCard() {
 		CardLayout layout = (CardLayout)card.getLayout();
 		layout.last(card);
+	}
+
+	/**
+	 * 获取消息已读状态，已读返回true, 否则返回false。
+	 * @return 消息状态
+	 */
+	public boolean isReadMessage() {
+		return readMessage;
+	}
+	
+	/**
+	 * 设置消息的已读状态，true表示已读，false表示未读。
+	 * @param readMessage 需要设置的消息的状态
+	 */
+	public void setReadMessage(boolean readMessage) {
+		this.readMessage = readMessage;
+	}
+
+	/**
+	 * 获取当前登录的账号，未登录则为空串。
+	 * @return 当前登录的账号
+	 */
+	public String getMemberNo() {
+		return memberNo;
+	}
+
+	/**
+	 * 设置当前登录的账号，未登录请使用空串""。
+	 * @param memberNo 需要设置的会员账号
+	 */
+	public void setMemberNo(String memberNo) {
+		this.memberNo = memberNo;
 	}
 }

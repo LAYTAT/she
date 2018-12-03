@@ -75,6 +75,7 @@ public abstract class AbstractDao {
 	/**
 	 * 根据SQL语句执行数据查询并返回结果集。
 	 * 发生异常时会更新消息并返回空值。
+	 * 该方法执行后会自动关闭连接，多次使用时需要重新获取连接对象。
 	 * @param sql 需要执行的SQL语句
 	 * @return 只有成功查询了数据库数据才返回结果集，其它情况都返回null
 	 */
@@ -97,7 +98,7 @@ public abstract class AbstractDao {
 				if(conn != null)
 					conn.close();
 			} catch (SQLException e3) {
-				message = "服务器连接关闭错误";
+				message = "服务器关闭连接错误";
 			}
 		}
 		return null;
@@ -106,6 +107,7 @@ public abstract class AbstractDao {
 	/**
 	 * 根据SQL语句更新数据库表的数据，包括增加、删除、修改语句。
 	 * 发生异常时会更新消息并返回错误。
+	 * 该方法执行后会自动关闭连接，多次使用时需要重新获取连接对象。
 	 * @param sql 需要执行的SQL语句
 	 * @return 只有成功更新了数据库表的数据才返回true，其它情况都返回false
 	 */
