@@ -5,6 +5,7 @@ import java.awt.EventQueue;
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 
+import team.ecust.she.dao.MemberDao;
 import team.ecust.she.view.PromptBox.Tips;
 
 import java.awt.Toolkit;
@@ -44,7 +45,6 @@ public final class Index {
 	
 	/**用于保存对象的实例*/
 	private static Index INDEX = null;
-	
 	/**获取首页的实例对象。*/
 	public static Index getInstance() {
 		if(INDEX == null)
@@ -56,18 +56,20 @@ public final class Index {
 	private int type;
 	/**当前皮肤的颜色，默认为标准背景色*/
 	private Colors colors;
+	/**窗体对象*/
+	private JFrame frame;
 	/**消息已读未读状态，默认为已读*/
 	private boolean readMessage;
 	/**登录会员的号码，默认为空串，代表未登录*/
 	private String memberNo;
-	/**窗体对象*/
-	private JFrame frame;
 	/**搜索文本框*/
 	private JTextField search;
 	/**头像面板*/
 	private Photo headPortrait;
 	/**昵称标签*/
 	private JLabel nickname;
+	/**消息标签*/
+	private JLabel messages;
 	/**卡片内容面板*/
 	private JPanel card;
 
@@ -294,23 +296,17 @@ public final class Index {
 		appearance.setIcon(new ImageIcon(Index.class.getResource("/team/ecust/she/resource/image/severance_o.png")));
 		topBar.add(appearance);//-width-20
 		
-		JLabel messages = new JLabel();
+		messages = new JLabel();
 		messages.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseEntered(MouseEvent e) {
 				frame.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-				if(readMessage)
-					messages.setIcon(new ImageIcon(Index.class.getResource("/team/ecust/she/resource/image/messages_i.png")));
-				else
-					messages.setIcon(new ImageIcon(Index.class.getResource("/team/ecust/she/resource/image/messages_ui.png")));
+				updateMessages(false);
 			}
 			@Override
 			public void mouseExited(MouseEvent e) {
 				frame.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
-				if(readMessage)
-					messages.setIcon(new ImageIcon(Index.class.getResource("/team/ecust/she/resource/image/messages_o.png")));
-				else
-					messages.setIcon(new ImageIcon(Index.class.getResource("/team/ecust/she/resource/image/messages_uo.png")));
+				updateMessages(true);
 			}
 		});
 		messages.setIcon(new ImageIcon(Index.class.getResource("/team/ecust/she/resource/image/messages_o.png")));
@@ -436,10 +432,13 @@ public final class Index {
 			}
 			@Override
 			public void mouseClicked(MouseEvent e) {
-				(new PromptBox()).open("请登录");
+				MemberDao dao = new MemberDao();
+				dao.saveItems(null);
+				(new PromptBox()).open(dao.getMessage());
 				Login login = new Login();
 				showInCard(login);
 				login.display();
+				
 			}
 		});
 		myInfo.setBorder(null);
@@ -462,6 +461,7 @@ public final class Index {
 			public void mouseClicked(MouseEvent e) {
 				SoftwareInfo info = new SoftwareInfo();
 				showInCard(info);
+				info.display();
 			}
 		});
 		modifyInfo.setBorder(null);
@@ -775,7 +775,7 @@ public final class Index {
 		(new Timer()).schedule(new TimerTask() {
 			@Override
 			public void run() {
-				
+				updateMessages(true);
 			}
 		}, 2000);
 	}
@@ -833,6 +833,24 @@ public final class Index {
 			buffer.append("...");
 		}
 		nickname.setText(buffer.toString());
+	}
+	
+	/**
+	 * 根据消息读取状态更新消息标签的图标。
+	 * @param outORin 选择更新的图标类型
+	 */
+	private void updateMessages(boolean outORin) {
+		if(outORin) {
+			if(readMessage)
+				messages.setIcon(new ImageIcon(Index.class.getResource("/team/ecust/she/resource/image/messages_o.png")));
+			else
+				messages.setIcon(new ImageIcon(Index.class.getResource("/team/ecust/she/resource/image/messages_uo.png")));
+		} else {
+			if(readMessage)
+				messages.setIcon(new ImageIcon(Index.class.getResource("/team/ecust/she/resource/image/messages_i.png")));
+			else
+				messages.setIcon(new ImageIcon(Index.class.getResource("/team/ecust/she/resource/image/messages_ui.png")));
+		}
 	}
 	
 	/**

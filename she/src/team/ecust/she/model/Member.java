@@ -2,7 +2,12 @@ package team.ecust.she.model;
 
 import java.awt.Image;
 
-/**会员模型类，对应数据库里的会员表，所有属性都设为private，并实现get和set方法。*/
+/**<p>会员模型类，对应数据库里的会员表。
+ * <p>基本类型的属性都设置一个对应的空常量。
+ * <p>数据库中的枚举类型都在类中添加相应的枚举类型和字符串互相转换的方法。
+ * <p>日期类型使用String类型。
+ * <p>所有属性都设为private，并实现get和set方法。
+ */
 public final class Member {
 	/**信用分对应的空常量值*/
 	public final static int NULL_CREDIT = -1;
@@ -41,7 +46,7 @@ public final class Member {
 	 * @param cipher 登录密码
 	 */
 	public Member(String memberNo, String cipher) {
-		this.setMemberNo(memberNo);
+		this.memberNo = memberNo;
 		this.cipher = cipher;
 		this.nickname = null;
 		this.realName = null;
@@ -109,7 +114,37 @@ public final class Member {
 	public void setSex(Gender sex) {
 		this.sex = sex;
 	}
-
+	
+	/**
+	 * 根据会员性别枚举返回对应存储在数据库里的字符串。
+	 * @return 性别对应的字符串，如果性别为空，则返回空对象
+	 */
+	public String switchSexToString() {
+		if(sex == null)
+			return null;
+		switch (sex) {
+		case MALE:   return "male";
+		case FEMALE: return "female";
+		default: return null;
+		}
+	}
+	
+	/**
+	 * 根据会员性别字符串改变对应对象的性别枚举属性。
+	 * @param sex 需要转换的性别字符串，为空对象或不合法则不改变对象的属性
+	 */
+	public void switchSexToEnum(String sex) {
+		if(sex == null)
+			return;
+		switch (sex) {
+		case "male":   this.sex = Gender.MALE;
+			break;
+		case "female": this.sex = Gender.FEMALE;
+			break;
+		default: return;
+		}
+	}
+	
 	public String getMajor() {
 		return major;
 	}
@@ -117,7 +152,7 @@ public final class Member {
 	public void setMajor(String major) {
 		this.major = major;
 	}
-
+	
 	public String getAddress() {
 		return address;
 	}
@@ -148,6 +183,39 @@ public final class Member {
 
 	public void setState(MemberState state) {
 		this.state = state;
+	}
+	
+	/**
+	 * 根据会员状态枚举返回对应存储在数据库里的字符串。
+	 * @return 状态对应的字符串，如果状态为空，则返回空对象
+	 */
+	public String switchStateToString() {
+		if(state == null)
+			return null;
+		switch (state) {
+		case OFFLINE: return "offline";
+		case ONLINE:  return "online";
+		case FROZEN:  return "frozen";
+		default: return null;
+		}
+	}
+	
+	/**
+	 * 根据会员状态字符串改变对应对象的状态枚举属性。
+	 * @param state 需要转换的状态字符串，为空对象或不合法则不改变对象的属性
+	 */
+	public void switchStateToEnum(String state) {
+		if(state == null)
+			return;
+		switch (state) {
+		case "offline": this.state = MemberState.OFFLINE;
+			break;
+		case "online":  this.state = MemberState.ONLINE;
+			break;
+		case "frozen":  this.state = MemberState.FROZEN;
+			break;
+		default: return;
+		}
 	}
 
 	public String getMailbox() {
