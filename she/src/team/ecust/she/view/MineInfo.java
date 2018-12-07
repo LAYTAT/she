@@ -15,6 +15,8 @@ import javax.swing.border.LineBorder;
 
 import com.wis.pack.component.Photo;
 
+import team.ecust.she.model.DemandGoods;
+import team.ecust.she.model.IdleGoods;
 import team.ecust.she.model.Member;
 import team.ecust.she.model.Member.Gender;
 
@@ -191,25 +193,33 @@ public final class MineInfo extends JPanel {
 	/**
 	 * 在卡片里展示我的上传。
 	 */
-	public void showMyUploads() {
-		if(card == null)
-			return;
+	public void showMyUploads(IdleGoods k[], DemandGoods v[]) {
+		if(k != null) {
+			int rows = k.length;
+			for(int i = 0; i < rows; i++) {
+				//添加闲置物品列表
+			}
+		}
+		if(v != null) {
+			int rows = v.length;
+			for(int i = 0; i < rows; i++) {
+				//添加需求物品列表
+			}
+		}
 	}
 	
 	/**
 	 * 在卡片里展示我的交易。
 	 */
 	public void showMyTrades() {
-		if(card == null)
-			return;
+		
 	}
 	
 	/**
 	 * 在卡片里展示相关评论。
 	 */
 	public void showRelativeComments() {
-		if(card == null)
-			return;
+		
 	}
 	
 	/**

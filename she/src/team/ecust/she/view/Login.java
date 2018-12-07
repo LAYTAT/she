@@ -17,6 +17,10 @@ import java.awt.Cursor;
 
 import javax.swing.border.MatteBorder;
 import com.wis.pack.component.Photo;
+
+import team.ecust.she.common.FileTool;
+import team.ecust.she.controller.LoginIn;
+
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
@@ -28,6 +32,8 @@ public final class Login extends JPanel {
 	private JTextField memberNoTextField;
 	
 	private JPasswordField pwdTextField;
+	private JCheckBox autoLoginCheckBox;
+	private JCheckBox remPwdCheckBox;
 	
 	//private Photo headPortrait;
 
@@ -45,10 +51,17 @@ public final class Login extends JPanel {
 		this.memberNoTextField.setText(MemNo);; 
 	}
 	public String getPassword(){
-		return pwdTextField.getPassword().toString();
+		return new String(pwdTextField.getPassword());
 	}
 	public String getMemberNo(){
 		return memberNoTextField.getText();
+	}
+	
+	public boolean autoLogin() {
+		return autoLoginCheckBox.isSelected();
+	}
+	public boolean remeCipher() {
+		return remPwdCheckBox.isSelected();
 	}
 	
 	
@@ -87,15 +100,17 @@ public final class Login extends JPanel {
 		panel.setLayout(null);
 		add(panel);
 		
+		FileTool tools = new FileTool(FileTool.LOGIN_SETTING);
+		
 		//开始摆放部件
-		memberNoTextField = new JTextField();
+		memberNoTextField = new JTextField(tools.readTheLine(3) == null ? "" : tools.readTheLine(3));
 		memberNoTextField.setToolTipText("账号");
 		memberNoTextField.setFont(new Font("微软雅黑", Font.BOLD, 25));
 		memberNoTextField.setBounds(100, 40, 300, 50);
 		memberNoTextField.setColumns(20);
 	    panel.add(memberNoTextField);
 
-		pwdTextField = new JPasswordField();
+		pwdTextField = new JPasswordField(tools.readTheLine(4) == null ? "" : tools.readTheLine(4));
 		pwdTextField.setToolTipText("密码");
 		pwdTextField.setFont(new Font("微软雅黑", Font.BOLD, 25));
 		pwdTextField.setBounds(100, 100, 300, 50);
@@ -117,23 +132,57 @@ public final class Login extends JPanel {
 		findPwdLabel.setBounds(20, 260, 72, 20);
 		panel.add(findPwdLabel);
 		
-		JCheckBox autoLoginCheckBox = new JCheckBox("自动登录");
+		autoLoginCheckBox = new JCheckBox("自动登录");
 		autoLoginCheckBox.setFont(Fonts.LOGIN_LABEL_FONT.getFont());
 		autoLoginCheckBox.setBounds(100, 160, 100, 20);
+		if(("YES").equals(tools.readTheLine(2)))
+			autoLoginCheckBox.setSelected(true);
 		panel.add(autoLoginCheckBox);
 		
-		JCheckBox remPwdCheckBox = new JCheckBox("记住密码");
+		remPwdCheckBox = new JCheckBox("记住密码");
 		remPwdCheckBox.setFont(Fonts.LOGIN_LABEL_FONT.getFont());
 		remPwdCheckBox.setBounds(290, 160, 100, 20);
+		if(("YES").equals(tools.readTheLine(1)))
+			remPwdCheckBox.setSelected(true);
 		panel.add(remPwdCheckBox);
 		
-		JButton loginConfirmButton = new JButton("登录");
-		loginConfirmButton.addMouseListener(new MouseAdapter() {
+		autoLoginCheckBox.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
-				
+				FileTool tool = new FileTool(FileTool.LOGIN_SETTING);
+				if(!autoLoginCheckBox.isSelected())
+					tool.writeTheLine("NO", 2);
+				else {
+					if(!remPwdCheckBox.isSelected()) {
+						remPwdCheckBox.setSelected(true);
+						tool.writeTheLine("YES", 1);
+						tool.writeTheLine(getPassword(), 4);
+					}
+					tool.writeTheLine("YES", 2);
+				}
 			}
 		});
+		remPwdCheckBox.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				FileTool tool = new FileTool(FileTool.LOGIN_SETTING);
+				if(remPwdCheckBox.isSelected()) {
+					tool.writeTheLine("YES", 1);
+					tool.writeTheLine(getPassword(), 4);
+				}
+				else {
+					if(autoLoginCheckBox.isSelected()) {
+						autoLoginCheckBox.setSelected(false);
+						tool.writeTheLine("NO", 2);
+					}
+					tool.writeTheLine("NO", 1);
+					tool.writeTheLine("", 4);
+				}
+			}
+		});
+		
+		JButton loginConfirmButton = new JButton("登录");
+		loginConfirmButton.addMouseListener(new LoginIn<Login>(this));
 		loginConfirmButton.setBackground(SystemColor.textHighlight);
 		loginConfirmButton.setForeground(Color.WHITE);
 		loginConfirmButton.setFont(Fonts.LOGIN_MAIN_FONT.getFont());
@@ -159,7 +208,6 @@ public final class Login extends JPanel {
 		toRegisterLabel.setFont(new Font("等线", Font.PLAIN, 18));
 		toRegisterLabel.setBounds(400, 260, 72, 20);
 		panel.add(toRegisterLabel);
-
 	}
 	public enum Fonts {
 		/*登陆框主要字体*/

@@ -5,7 +5,9 @@ import java.awt.EventQueue;
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 
-import team.ecust.she.dao.MemberDao;
+import team.ecust.she.controller.LoginIn;
+import team.ecust.she.controller.Search;
+import team.ecust.she.controller.ViewMineInfo;
 import team.ecust.she.view.PromptBox.Tips;
 
 import java.awt.Toolkit;
@@ -36,45 +38,54 @@ import java.awt.CardLayout;
 import java.awt.Component;
 import javax.swing.border.MatteBorder;
 
-/**首页界面类，也是窗口的整体框架，包含主函数。*/
+/**
+ * <p>首页界面类，也是窗口的整体框架，包含主函数。
+ */
 public final class Index {
 	/**设备屏幕的最大宽度*/
 	public final static int SCREEN_WIDTH  = Toolkit.getDefaultToolkit().getScreenSize().width;
 	/**设备屏幕的最大高度*/
 	public final static int SCREEN_HEIGHT = Toolkit.getDefaultToolkit().getScreenSize().height;
+	/**用户未登录时的编号*/
+	public final static String VISITOR = "";
 	
-	/**用于保存对象的实例*/
+	/**用于保存应用程序的实例*/
 	private static Index INDEX = null;
-	/**获取首页的实例对象。*/
+	/**
+	 * <p>通过首页的静态对象获取首页应用程序的实例。
+	 * <p>如果为空则新建首页对象，否则返回原有对象。
+	 * <p>其他类可以通过此来获取首页的信息。
+	 * @return 已经存在的首页实例，一般一个应用程序就是一个固定的
+	 */
 	public static Index getInstance() {
 		if(INDEX == null)
 			INDEX = new Index();
 		return INDEX;
 	}
 	
-	/**当前皮肤对应的数字标识符，默认为零*/
+	/**当前皮肤的颜色对应的数字标识符*/
 	private int type;
-	/**当前皮肤的颜色，默认为标准背景色*/
+	/**当前皮肤的颜色枚举对象*/
 	private Colors colors;
-	/**窗体对象*/
+	/**应用程序的窗体对象*/
 	private JFrame frame;
-	/**消息已读未读状态，默认为已读*/
+	/**消息已读未读的状态*/
 	private boolean readMessage;
-	/**登录会员的号码，默认为空串，代表未登录*/
+	/**当前登录会员的号码*/
 	private String memberNo;
-	/**搜索文本框*/
+	/**顶栏的搜索文本框*/
 	private JTextField search;
-	/**头像面板*/
+	/**顶栏的头像面板*/
 	private Photo headPortrait;
-	/**昵称标签*/
+	/**顶栏的昵称标签*/
 	private JLabel nickname;
-	/**消息标签*/
+	/**顶栏的消息标签*/
 	private JLabel messages;
 	/**卡片内容面板*/
 	private JPanel card;
 
 	/**
-	 * 在主函数里启动应用程序。
+	 * <p>在主函数里启动应用程序。
 	 * @param args 使用命令行启动该程序时输入的参数
 	 */
 	public static void main(String[] args) {
@@ -90,7 +101,9 @@ public final class Index {
 		});
 	}
 
-	/**初始化各项参数并加载显示首页对象，背景色默认为顶栏标准背景色，消息默认为已读，会员号码默认为空串。 */
+	/**
+	 * <p>初始化各项属性并加载显示首页对象，背景色默认为顶栏标准背景色，消息默认为已读，会员号码默认为空串。
+	 */
 	private Index() {
 		type = 0;
 		colors = Colors.TOP_BAR_BACKGROUND;
@@ -100,7 +113,10 @@ public final class Index {
 		readMessagesFromDataBase(1000);
 	}
 
-	/**初始化首页界面内容。*/
+	/**
+	 * <p>初始化首页界面的内容。
+	 * <p>初始化不需要联网。
+	 */
 	private void initialize() {
 		frame = new JFrame();
 		frame.setUndecorated(true);//去除原始顶栏
@@ -109,12 +125,14 @@ public final class Index {
 		frame.setIconImage(Toolkit.getDefaultToolkit().getImage(Index.class.getResource("/team/ecust/she/resource/image/window.png")));//设置任务栏图标
 		loadTopBar();
 		loadContent();
-		card = new JPanel();//加载卡片内容
+		card = new JPanel();//初始化卡片
 		frame.getContentPane().add(card, BorderLayout.CENTER);
 		card.setLayout(new CardLayout());
 	}
 	
-	/**加载顶栏内容。*/
+	/**
+	 * <p>加载顶栏内容。
+	 */
 	private void loadTopBar() {
 		JPanel topBar = new JPanel();
 		topBar.setBackground(colors.getColor());
@@ -180,16 +198,7 @@ public final class Index {
 		input.add(search);//-240
 		
 		JButton query = new JButton("搜索");
-		query.addMouseListener(new MouseAdapter() {
-			@Override
-			public void mouseEntered(MouseEvent e) {
-				frame.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-			}
-			@Override
-			public void mouseExited(MouseEvent e) {
-				frame.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
-			}
-		});
+		query.addMouseListener(new Search<JButton>(query));//添加业务
 		query.setBorder(null);
 		query.setPreferredSize(new Dimension(70, 28));
 		query.setFont(Fonts.TOP_BAR_SEARCH.getFont());
@@ -197,8 +206,8 @@ public final class Index {
 		query.setForeground(Colors.TOP_BAR_SEARCH_FOREGROUND.getColor());
 		input.add(query);//-70
 		
-		//公式：SCREEN_WIDTH - 15*width + adjust - 548 - 1.2*10*title.size - 1.2*5*nickname.size//adjust=80微调//中文=1.2*英文
-		int fitWidth = SCREEN_WIDTH - 808 - 12*Fonts.TOP_BAR_TITLE.getSize() - 6*Fonts.TOP_BAR_NICKNAME.getSize();
+		//公式：SCREEN_WIDTH - 15*width + adjust - 548 - 1.2*10*title.size - 1.2*5*nickname.size//adjust=110微调//中文=1.2*英文
+		int fitWidth = SCREEN_WIDTH - 832 - 12*Fonts.TOP_BAR_TITLE.getSize() - 6*Fonts.TOP_BAR_NICKNAME.getSize();
 		JPanel blank = new JPanel();
 		blank.setPreferredSize(new Dimension(fitWidth, 10));//设置占位面板的最佳宽度
 		blank.setBackground(colors.getColor());
@@ -239,6 +248,14 @@ public final class Index {
 			public void mouseExited(MouseEvent e) {
 				frame.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
 				nickname.setForeground(Colors.TOP_BAR_NICKNAME_FOREGROUND_OUT.getColor());
+			}
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				if(!VISITOR.equals(getMemberNo()))
+					return;
+				Login login = new Login();
+				showInCard(login);
+				login.display();
 			}
 		});
 		nickname.setFont(Fonts.TOP_BAR_NICKNAME.getFont());
@@ -403,7 +420,9 @@ public final class Index {
 		topBar.add(close);//-width-20-width
 	}
 	
-	/**加载目录内容，不要尝试模块化提高代码重用率，会出错。*/
+	/**
+	 * <p>加载目录内容，不要尝试模块化提高代码重用率，会出错。
+	 */
 	private void loadContent() {
 		JPanel content = new JPanel(new GridLayout(22, 0, 0, 0));//根据实际情况调整目录行数和竖直间距
 		content.setBorder(new EmptyBorder(10, 10, 0, 20));//设置左右边界宽度
@@ -421,26 +440,7 @@ public final class Index {
 		content.add(mine);
 		
 		JButton myInfo = new JButton("个人信息");
-		myInfo.addMouseListener(new MouseAdapter() {
-			@Override
-			public void mouseEntered(MouseEvent e) {
-				myInfo.setBackground(Colors.TOP_BAR_BACKGROUND.getColor());
-			}
-			@Override
-			public void mouseExited(MouseEvent e) {
-				myInfo.setBackground(Colors.LEFT_CONTENT_BACKGROUND.getColor());
-			}
-			@Override
-			public void mouseClicked(MouseEvent e) {
-				MemberDao dao = new MemberDao();
-				dao.saveItems(null);
-				(new PromptBox()).open(dao.getMessage());
-				Login login = new Login();
-				showInCard(login);
-				login.display();
-				
-			}
-		});
+		myInfo.addMouseListener(new ViewMineInfo<JButton>(myInfo));
 		myInfo.setBorder(null);
 		myInfo.setFont(Fonts.LEFT_CONTENT_OPTION.getFont());
 		myInfo.setBackground(Colors.LEFT_CONTENT_BACKGROUND.getColor());
@@ -459,9 +459,7 @@ public final class Index {
 			}
 			@Override
 			public void mouseClicked(MouseEvent e) {
-				SoftwareInfo info = new SoftwareInfo();
-				showInCard(info);
-				info.display();
+				
 			}
 		});
 		modifyInfo.setBorder(null);
@@ -479,6 +477,12 @@ public final class Index {
 			@Override
 			public void mouseExited(MouseEvent e) {
 				uploadIdleGoods.setBackground(Colors.LEFT_CONTENT_BACKGROUND.getColor());
+			}
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				UploadIdleGoods uploadIdleGoods = new UploadIdleGoods();
+				showInCard(uploadIdleGoods);
+				uploadIdleGoods.display();
 			}
 		});
 		uploadIdleGoods.setBorder(null);
@@ -768,16 +772,28 @@ public final class Index {
 	}
 	
 	/**
-	 * 每隔一段时间从数据库读取消息，并处理。
+	 * <p>每隔一段时间从数据库读取消息，并处理。
 	 * @param duration 间隔时间，单位为毫秒
 	 */
 	private void readMessagesFromDataBase(int duration) {
-		(new Timer()).schedule(new TimerTask() {
+		Timer dynamic = new Timer();
+		dynamic.schedule(new TimerTask() {
 			@Override
 			public void run() {
-				updateMessages(true);
+				Login login = new Login();
+				showInCard(login);
+				login.display();
+				login.repaint();
+				if(login.autoLogin())
+					LoginIn.doIt(login);
+				dynamic.schedule(new TimerTask() {
+					@Override
+					public void run() {
+						updateMessages(true);
+					}
+				}, 2000);
 			}
-		}, 2000);
+		}, 1000);
 	}
 	
 	/**显示高清头像。*/
@@ -803,16 +819,20 @@ public final class Index {
 	}
 	
 	/**
-	 * 设置顶栏的头像面板。
-	 * 使用Toolkit.getDefaultToolkit().getImage()方法，文件路径必须以src开头
+	 * <p>设置顶栏的头像面板。
+	 * <p>使用Toolkit.getDefaultToolkit().getImage()方法，文件路径必须以src开头
 	 * @param image 需要设置的图标对象
 	 */
 	public void setHeadPortrait(Image image) {
 		headPortrait.setPhoto(image);
 	}
 	
+	public void setHeadPortrait(String absolutepath) {
+		setHeadPortrait(Toolkit.getDefaultToolkit().getImage(absolutepath));
+	}
+	
 	/**
-	 * 获取顶栏的头像对象。
+	 * <p>获取顶栏的头像对象。
 	 * @return 头像对应的图像对象
 	 */
 	public Image getHeadPortrait() {
@@ -820,10 +840,12 @@ public final class Index {
 	}
 	
 	/**
-	 * 设置顶栏的昵称文字，如果字符串长度超过5，只显示前四个字符，用三个.隐藏后半部分。
+	 * <p>设置顶栏的昵称文字，如果字符串长度超过5，只显示前四个字符，用三个.隐藏后半部分。
 	 * @param name 需要显示的名字字符串
 	 */
 	public void setNickname(String name) {
+		if(name == null) 
+			name = "没有名字";
 		StringBuffer buffer = new StringBuffer(name);
 		while(buffer.length() < 5) {
 			buffer.append(' ');
@@ -836,7 +858,7 @@ public final class Index {
 	}
 	
 	/**
-	 * 根据消息读取状态更新消息标签的图标。
+	 * <p>根据消息读取状态更新消息标签的图标。
 	 * @param outORin 选择更新的图标类型
 	 */
 	private void updateMessages(boolean outORin) {
@@ -854,7 +876,7 @@ public final class Index {
 	}
 	
 	/**
-	 * 获取检索的信息。
+	 * <p>获取检索的信息。
 	 * @return 搜索框内的字符串
 	 */
 	public String getSearchContent() {
@@ -862,7 +884,7 @@ public final class Index {
 	}
 	
 	/**
-	 * 将参数对应的组件添加到首页的中心卡片中，并自动作为最上层显示。
+	 * <p>将参数对应的组件添加到首页的中心卡片中，并自动作为最上层显示。
 	 * @param component 需要添加到中心卡片显示的组件，为空啥也不做
 	 */
 	public void showInCard(Component component) {
@@ -884,18 +906,6 @@ public final class Index {
 		CardLayout layout = (CardLayout)card.getLayout();
 		layout.previous(card);
 	}
-	
-	/**跳转至第一张卡片。*/
-	public void firstCard() {
-		CardLayout layout = (CardLayout)card.getLayout();
-		layout.first(card);
-	}
-	
-	/**跳转至最后一张卡片。*/
-	public void lastCard() {
-		CardLayout layout = (CardLayout)card.getLayout();
-		layout.last(card);
-	}
 
 	/**
 	 * 获取消息已读状态，已读返回true, 否则返回false。
@@ -914,7 +924,7 @@ public final class Index {
 	}
 
 	/**
-	 * 获取当前登录的账号，未登录则为空串。
+	 * 获取当前登录的账号，未登录则为游客常量。
 	 * @return 当前登录的账号
 	 */
 	public String getMemberNo() {

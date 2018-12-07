@@ -11,7 +11,7 @@ import java.util.Vector;
 
 import javax.swing.JPanel;
 
-import team.ecust.she.common.TextFile;
+import team.ecust.she.common.FileTool;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
 
@@ -81,10 +81,10 @@ public class SoftwareInfo extends JPanel {
 		
 		vector = new Vector<RowWord>();//以10个为单位分配
 		String text = null;
-		TextFile file = new TextFile(TextFile.SOFTWARE_INFO);//新建软件信息文件对象
+		FileTool file = new FileTool(FileTool.SOFTWARE_INFO);//新建软件信息文件对象
 		
 		for(int i = 1; ; i++) {//添加数据
-			text = file.getOneRowData(i);
+			text = file.readTheLine(i);
 			if(text == null)//读完了数据
 				break;
 			RowWord word = new RowWord();

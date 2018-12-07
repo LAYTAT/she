@@ -1,8 +1,7 @@
 package team.ecust.she.model;
 
-import java.awt.Image;
-
-/**<p>会员模型类，对应数据库里的会员表。
+/**
+ * <p>会员模型类，对应数据库里的会员表。
  * <p>基本类型的属性都设置一个对应的空常量。
  * <p>数据库中的枚举类型都在类中添加相应的枚举类型和字符串互相转换的方法。
  * <p>日期类型使用String类型。
@@ -38,10 +37,10 @@ public final class Member {
 	private String mailbox;
 	private String signature;
 	private String registerTime;
-	private Image headPortrait;
+	private String headPortrait;
 	
 	/**
-	 * 根据会员编号和登录密码初始化会员对象，其他默认为空对象，基本类型默认为本类中对应的空常量值。
+	 * <p>根据会员编号和登录密码初始化会员对象，其他默认为空对象，基本类型默认为本类中对应的空常量值。
 	 * @param memberNo 会员编号
 	 * @param cipher 登录密码
 	 */
@@ -63,14 +62,16 @@ public final class Member {
 	}
 	
 	/**
-	 * 根据会员编号初始化会员对象，其他默认为空对象，基本类型默认为本类中对应的空常量值。
+	 * <p>根据会员编号初始化会员对象，其他默认为空对象，基本类型默认为本类中对应的空常量值。
 	 * @param memberNo 会员编号
 	 */
 	public Member(String memberNo) {
 		this(memberNo, null);
 	}
 	
-	/** 所有属性默认为空对象，基本类型默认为本类中对应的空常量值。 */
+	/** 
+	 * <p>所有属性默认为空对象，基本类型默认为本类中对应的空常量值。
+	 */
 	public Member() {
 		this(null, null);
 	}
@@ -201,7 +202,7 @@ public final class Member {
 	}
 	
 	/**
-	 * 根据会员状态字符串改变对应对象的状态枚举属性。
+	 * <p>根据会员状态字符串改变对应对象的状态枚举属性。
 	 * @param state 需要转换的状态字符串，为空对象或不合法则不改变对象的属性
 	 */
 	public void switchStateToEnum(String state) {
@@ -242,11 +243,11 @@ public final class Member {
 		this.registerTime = registerTime;
 	}
 
-	public Image getHeadPortrait() {
+	public String getHeadPortrait() {
 		return headPortrait;
 	}
 
-	public void setHeadPortrait(Image headPortrait) {
+	public void setHeadPortrait(String headPortrait) {
 		this.headPortrait = headPortrait;
 	}
 }
