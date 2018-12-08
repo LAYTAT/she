@@ -90,9 +90,9 @@ public final class Login extends JPanel {
 		setBorder(new EmptyBorder((height-subPanelHeight)/2, (width-subPanelWidth)/2, (height-subPanelHeight)/2, (width-subPanelWidth)/2));
 		
 		Photo photo =new Photo("src/team/ecust/she/resource/image/login.jpg");
-		photo.setScaleFunction(true);
-		photo.setDragFunction(true);
-		photo.setRecoverFunction(true);
+		//photo.setScaleFunction(true);
+		//photo.setDragFunction(true);
+		//photo.setRecoverFunction(true);
 		add(photo);
 		
 		JPanel panel = new JPanel();

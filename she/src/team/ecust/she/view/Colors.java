@@ -60,6 +60,15 @@ public enum Colors {
 	MINE_INFO_STATEMENT_BORDER(new Color(150, 220, 230)),
 	/**我的信息界面选项面板边款的前景色*/
 	MINE_INFO_OPTIONS_BORDER(new Color(150, 150 , 150)),
+	
+	/**编辑个人信息界面标题的分割线前景色*/
+	MODIFY_INFO_TITLE_BORDER(new Color(120, 120, 120)),
+	/**编辑个人信息界面下拉框的背景色*/
+	MODIFY_INFO_COMBOC_BACKGROUND(new Color(100, 100, 100)),
+	/**编辑个人信息界面下拉框的前景色*/
+	MODIFY_INFO_COMBOC_FOREGROUND(new Color(200, 200, 200)),
+	/**编辑个人信息界面的按钮背景色*/
+	MODIFY_INFO_BUTTON_BACKGROUND(new Color(40, 150, 250)),
 	;
 	
 	/**枚举的颜色变量*/

@@ -61,6 +61,7 @@ public final class ImageTool {
 	 * @return 当前路径的绝对路径
 	 */
 	public String getAbsolutePath() {
+		addSrcIfNotExist();
 		try {
 			File file = new File(imagepath);
 			return file.getAbsolutePath();
@@ -68,6 +69,21 @@ public final class ImageTool {
 			System.err.println("->该文件路径为null");
 		}
 		return null;
+	}
+	
+	/**
+	 * <p>判断指定路径的文件是否存在。
+	 * @return 判断结果
+	 */
+	public boolean isExisted() {
+		try {
+			File file = new File(imagepath);
+			if(file.exists() && file.isFile() && file.canRead())
+				return true;
+		} catch (NullPointerException e2) {
+			System.err.println("->文件参数为空");
+		}
+		return false;
 	}
 	
 	/**

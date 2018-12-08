@@ -31,6 +31,13 @@ public enum Fonts {
 	MINE_INFO_STATEMENT_TITLE(new Font("黑体", Font.PLAIN, 16)),
 	/**我的信息界面选项面板的字体*/
 	MINE_INFO_OPTIONS(new Font("黑体", Font.PLAIN, 20)),
+	
+	/**修改信息界面的标题字体*/
+	MODIFY_INFO_TITLE(new Font("黑体", Font.PLAIN, 30)),
+	/**编辑个人信息界面左侧提示标签的字体*/
+	MODIFY_INFO_LEFT_LABEL(new Font("微软雅黑", Font.PLAIN, 22)),
+	/**编辑个人信息界面左侧输入框的字体*/
+	MODIFY_INFO_LEFT_TEXT(new Font("黑体", Font.PLAIN, 22)),
 	;
 	
 	/**枚举的字体变量*/

@@ -2,6 +2,7 @@ package team.ecust.she.view;
 
 import javax.swing.JPanel;
 
+
 import java.awt.Font;
 import java.awt.GridLayout;
 
@@ -11,7 +12,6 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.JButton;
 import java.awt.SystemColor;
 import java.awt.Color;
-import java.awt.Cursor;
 import java.awt.Dimension;
 
 import javax.swing.border.MatteBorder;
@@ -20,12 +20,14 @@ import com.wis.pack.component.Photo;
 
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
 import javax.swing.JComboBox;
 import javax.swing.JFileChooser;
 
 import javax.swing.JEditorPane;
+
 
 @SuppressWarnings("serial")
 public final class UploadIdleGoods extends JPanel {
@@ -73,32 +75,31 @@ public final class UploadIdleGoods extends JPanel {
 		return degreeTextField.getText().toString();
 	}
 	/**
-	 * @return  String 闲置物品新旧程度
+	 * @return  String 图片1的路径
 	 */
 	public String getPhoto1Path() {
 		return chosePhoto1.getSelectedFile().getAbsolutePath();
 	}
 	/**
-	 * @return  String 图片1的路径
+	 * @return  String 图片2的路径
 	 */
 	public String getPhoto2Path() {
 		return chosePhoto2.getSelectedFile().getAbsolutePath();
 	}
 	/**
-	 * @return  String 图片2的路径
+	 * @return  String 图片3的路径
 	 */
 	public String getPhoto3Path() {
 		return chosePhoto3.getSelectedFile().getAbsolutePath();
 	}
 	/**
-	 * @return  String 图片3的路径
+	 * @return  String 图片4的路径
 	 */
 	public String getPhoto4Path() {
 		return chosePhoto4.getSelectedFile().getAbsolutePath();
 	}
 	/**
-	 * @return  String 图片4的路径
-	 */
+	 * @return String 闲置物品的卖家备注*/
 	public String getIdleGoodsNote() {
 		return note.getText().toString();
 	}
@@ -268,41 +269,21 @@ public final class UploadIdleGoods extends JPanel {
 	    
 	    
 	    JLabel toChosePhotoLabel = new JLabel("点击按钮选择上传大于一张小于四张闲置物品图片:");
-	    toChosePhotoLabel.setBounds(0, -16, 600, 97);
+	    toChosePhotoLabel.setBounds(26, -18, 600, 97);
 	    toChosePhotoLabel.setFont(Fonts.BOLD_PROMPT_TEXT.getFont());
 	    filePanel1.add(toChosePhotoLabel);
 	    
 	    
 	    JPanel photoPanel1 = new JPanel();
 	    photoPanel1.setBorder(new MatteBorder(1, 1, 1, 1, (Color) Color.BLACK));
-	    photoPanel1.setBounds(10, 83, 277, 285);
+	    photoPanel1.setBounds(38, 83, 261, 285);
 	    filePanel1.add(photoPanel1);
-	    photoPanel1.setLayout(new GridLayout(1, 1, 0, 0));
-	    
-	    JButton photoButton1 = new JButton("照片1");
-	    photoButton1.setForeground(Color.WHITE);
-	    photoButton1.setBackground(SystemColor.textHighlight);
-	    photoButton1.addMouseListener(new MouseAdapter() {
-	    	@Override
-	    	public void mouseClicked(MouseEvent e) {
-	    	    chosePhoto1 =new JFileChooser();
-	    		chosePhoto1.showOpenDialog(chosePhoto1);
-	    		Photo photo1 =new Photo(chosePhoto1.getSelectedFile().getAbsolutePath());
-	    		photo1.setScaleFunction(true);
-	    		photo1.setDragFunction(true);
-	    		photo1.setRecoverFunction(true);
-	    		photoPanel1.add(photo1);
-	    		//photoButton1.setText("点击重新选择");
-	    	}
-	    });
-	    photoButton1.setFont(Fonts.PLAIN_PROMPT_TEXT.getFont());;
-	    photoButton1.setBounds(20, 381, 211, 43);
-	    filePanel1.add(photoButton1);
+	    photoPanel1.setLayout(new GridLayout(1, 1, 0, 0));;
 	    
 	    
 	    JPanel PhotoPanel2 = new JPanel();
 	    PhotoPanel2.setBorder(new MatteBorder(1, 1, 1, 1, (Color) new Color(0, 0, 0)));
-	    PhotoPanel2.setBounds(304, 83, 296, 285);
+	    PhotoPanel2.setBounds(325, 83, 261, 285);
 	    filePanel1.add(PhotoPanel2);
 	    PhotoPanel2.setLayout(new GridLayout(1, 1, 0, 0));
 	    
@@ -320,62 +301,46 @@ public final class UploadIdleGoods extends JPanel {
 	    		photo2.setRecoverFunction(true);
 	    		PhotoPanel2.add(photo2);
 	    		photoButton2.setText("点击重新选择");
+	    		PhotoPanel2.validate();
 	    		
 	    	}
 	    });
 	    photoButton2.setFont(Fonts.PLAIN_PROMPT_TEXT.getFont());;
-        photoButton2.setBounds(314, 381, 211, 43);
+        photoButton2.setBounds(352, 381, 211, 43);
 	    filePanel1.add(photoButton2);
 	    
-	    JLabel showPhotpLabel1 = new JLabel("显示");
-	    showPhotpLabel1.setFont(Fonts.PLAIN_PROMPT_TEXT.getFont());
-	    showPhotpLabel1.addMouseListener(new MouseAdapter() {
-	    	@Override
-			public void mouseEntered(MouseEvent e) {
-				setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-			}
-			@Override
-			public void mouseExited(MouseEvent e) {
-				setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
-			}
+	    JButton photoButton1 = new JButton("照片1");
+	    photoButton1.setBounds(62, 381, 211, 43);
+	    filePanel1.add(photoButton1);
+	    photoButton1.setForeground(Color.WHITE);
+	    photoButton1.setBackground(SystemColor.textHighlight);
+	    photoButton1.addMouseListener(new MouseAdapter() {
 	    	@Override
 	    	public void mouseClicked(MouseEvent e) {
-	    		 filePanel1.validate(); 
+	    	    chosePhoto1 =new JFileChooser();
+	    		chosePhoto1.showOpenDialog(chosePhoto1);
+	    		Photo photo1 =new Photo(chosePhoto1.getSelectedFile().getAbsolutePath());
+	    		photo1.setScaleFunction(true);
+	    		photo1.setDragFunction(true);
+	    		photo1.setRecoverFunction(true);
+	    		photoPanel1.add(photo1);
+	    		photoButton1.setText("点击重新选择");
+	    		photoPanel1.validate();
 	    	}
 	    });
-	    showPhotpLabel1.setBounds(233, 384, 76, 39);
-	    filePanel1.add(showPhotpLabel1);
-	    
-	    JLabel showPhotplabel2 = new JLabel("显示");
-	    showPhotplabel2.addMouseListener(new MouseAdapter() {
-	    	@Override
-			public void mouseEntered(MouseEvent e) {
-				setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-			}
-			@Override
-			public void mouseExited(MouseEvent e) {
-				setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
-			}
-	    	@Override
-	    	public void mouseClicked(MouseEvent e) {
-	    		filePanel1.validate(); 
-	    	}
-	    });
-	    showPhotplabel2.setFont(new Font("微软雅黑", Font.PLAIN, 25));
-	    showPhotplabel2.setBounds(541, 386, 76, 39);
-	    filePanel1.add(showPhotplabel2);
+	    photoButton1.setFont(Fonts.PLAIN_PROMPT_TEXT.getFont());
     
 	    JPanel notePanel = new JPanel();
 	    panel.add(notePanel);
 	    notePanel.setLayout(null);
 	    
-	    JLabel noteLabel = new JLabel("备注                                  ");
-	    noteLabel.setBounds(4, 138, 288, 34);
+	    JLabel noteLabel = new JLabel(" 备注:");
+	    noteLabel.setBounds(0, 0, 88, 34);
 	    noteLabel.setBorder(new MatteBorder(0, 0, 0, 0, (Color) new Color(0, 120, 215)));
 	    noteLabel.setFont(Fonts.BOLD_PROMPT_TEXT.getFont());
 	    notePanel.add(noteLabel);
 	    note = new JEditorPane();
-	    note.setBounds(94, 0, 506, 353);
+	    note.setBounds(94, 41, 506, 285);
 	    note.addFocusListener(new FocusAdapter() {
 	    	@Override
 	    	public void focusGained(FocusEvent e) {
@@ -397,7 +362,7 @@ public final class UploadIdleGoods extends JPanel {
 	    
 	    JButton confirmUploadButton = new JButton("确认上传");
 	    confirmUploadButton.setForeground(Color.WHITE);
-	    confirmUploadButton.setBackground(SystemColor.textHighlight);
+	    confirmUploadButton.setBackground(Color.PINK);
 	    /**判断是否填写了内容*/
 	    confirmUploadButton.addMouseListener(new MouseAdapter() {
 	    	@Override
@@ -405,27 +370,28 @@ public final class UploadIdleGoods extends JPanel {
 	    		if(priceTextField.getText().length() == 0 || priceTextField.getText().equals("xxx(人民币)") )
 	    		{
 	    			new PromptBox().open("请输入预期价格!");
+	    			
 	    		}
-	    		if(originalPriceTextField.getText().length() == 0 || originalPriceTextField.getText().equals("xxx(人民币)") )
+	    		else if(originalPriceTextField.getText().length() == 0 || originalPriceTextField.getText().equals("xxx(人民币)") )
 	    		{
 	    			new PromptBox().open("请输入原价!");
 	    		}
-	    		if(goodsNameTextField.getText().length() == 0 || goodsNameTextField.getText().equals("方便大家搜索到你的闲置") )
+	    		else if(goodsNameTextField.getText().length() == 0 || goodsNameTextField.getText().equals("方便大家搜索到你的闲置") )
 	    		{
 	    			new PromptBox().open("请输入名称!");
 	    		}
-	    		if(degreeTextField.getText().length() == 0 || degreeTextField.getText().equals("填写数字:1-9")|| degreeTextField.getText().length() >1)
+	    		else if(degreeTextField.getText().length() == 0 || degreeTextField.getText().equals("填写数字:1-9")|| degreeTextField.getText().length() >1|| !degreeTextField.getText().toString().matches("[0-9]"))
 	    		{
 	    			new PromptBox().open("请输入正确的新旧程度!");
 	    		}
-	    		if(note.getText().length()==0|| note.getText().length()>=300|| note.getText().equals("让大家更了解你的闲置物品(300字内)\r\n")){
+	    		else if(note.getText().length()==0|| note.getText().length()>=300|| note.getText().equals("让大家更了解你的闲置物品(300字内)\r\n")){
 	    			new PromptBox().open("请输入正确的备注!");
 	    		}
 	    			
 	    	}
 	    });
 	    confirmUploadButton.setFont(Fonts.BOLD_PROMPT_TEXT.getFont());
-	    confirmUploadButton.setBounds(300, 369, 300, 56);
+	    confirmUploadButton.setBounds(94, 342, 506, 43);
 	    notePanel.add(confirmUploadButton);
 	    
 	    
@@ -437,7 +403,7 @@ public final class UploadIdleGoods extends JPanel {
 	    
 	    JPanel photoPanel3 = new JPanel();
 	    photoPanel3.setBorder(new MatteBorder(1, 1, 1, 1, (Color) new Color(0, 0, 0)));
-	    photoPanel3.setBounds(12, 42, 275, 312);
+	    photoPanel3.setBounds(38, 42, 261, 285);
 	    filePanel2.add(photoPanel3);
 	    photoPanel3.setLayout(new GridLayout(1, 1, 0, 0));
 	    JButton photoButton3 = new JButton("照片3");
@@ -452,19 +418,20 @@ public final class UploadIdleGoods extends JPanel {
 	    		photo3.setRecoverFunction(true);
 	    		photoPanel3.add(photo3);
 	    		photoButton3.setText("点击重新选择");
+	    		photoPanel3.validate();
 	    		
 	    	}
 	    });
 	   photoButton3.setFont(Fonts.PLAIN_PROMPT_TEXT.getFont());;
 	    photoButton3.setBackground(SystemColor.textHighlight);
 	    photoButton3.setForeground(Color.WHITE);
-	    photoButton3.setBounds(21, 381, 207, 43);
+	    photoButton3.setBounds(66, 342, 207, 43);
 	    filePanel2.add(photoButton3);
 	    
 	    
 	    JPanel photoPanel4 = new JPanel();
 	    photoPanel4.setBorder(new MatteBorder(1, 1, 1, 1, (Color) new Color(0, 0, 0)));
-	    photoPanel4.setBounds(306, 41, 296, 312);
+	    photoPanel4.setBounds(325, 42, 261, 285);
 	    filePanel2.add(photoPanel4);
 	    photoPanel4.setLayout(new GridLayout(1, 1, 0, 0));
 	    
@@ -480,56 +447,14 @@ public final class UploadIdleGoods extends JPanel {
 	    		photo4.setRecoverFunction(true);
 	    		photoPanel4.add(photo4);
 	    		photoButton4.setText("点击重新选择");
-	    		
+	    		photoPanel4.validate();
 	    	}
 	    });
 	    photoButton4.setFont(Fonts.PLAIN_PROMPT_TEXT.getFont());;
 	    photoButton4.setForeground(Color.WHITE);
 	    photoButton4.setBackground(SystemColor.textHighlight);
-	    photoButton4.setBounds(323, 380, 207, 43);
+	    photoButton4.setBounds(353, 342, 207, 43);
 	    filePanel2.add(photoButton4);
-	    
-	    
-	 
-
-	    
-	    JLabel showPhotpLabel3 = new JLabel("显示");
-	    showPhotpLabel3.addMouseListener(new MouseAdapter() {
-	    	@Override
-			public void mouseEntered(MouseEvent e) {
-				setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-			}
-			@Override
-			public void mouseExited(MouseEvent e) {
-				setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
-			}
-	    	@Override
-	    	public void mouseClicked(MouseEvent e) {
-	    		filePanel2.validate(); 
-	    	}
-	    });
-	    showPhotpLabel3.setFont(new Font("微软雅黑", Font.PLAIN, 25));
-	    showPhotpLabel3.setBounds(232, 384, 76, 39);
-	    filePanel2.add(showPhotpLabel3);
-	    
-	    JLabel showPhotpLabel4 = new JLabel("显示");
-	    showPhotpLabel4.addMouseListener(new MouseAdapter() {
-	    	@Override
-			public void mouseEntered(MouseEvent e) {
-				setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-			}
-			@Override
-			public void mouseExited(MouseEvent e) {
-				setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
-			}
-	    	@Override
-	    	public void mouseClicked(MouseEvent e) {
-	    		filePanel2.validate(); 
-	    	}
-	    });
-	    showPhotpLabel4.setFont(new Font("微软雅黑", Font.PLAIN, 25));
-	    showPhotpLabel4.setBounds(536, 387, 76, 39);
-	    filePanel2.add(showPhotpLabel4);
 
 	    }    
 

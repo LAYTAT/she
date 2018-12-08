@@ -6,6 +6,7 @@ import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 
 import team.ecust.she.controller.LoginIn;
+import team.ecust.she.controller.EditMineInfo;
 import team.ecust.she.controller.Search;
 import team.ecust.she.controller.ViewMineInfo;
 import team.ecust.she.view.PromptBox.Tips;
@@ -251,8 +252,12 @@ public final class Index {
 			}
 			@Override
 			public void mouseClicked(MouseEvent e) {
-				if(!VISITOR.equals(getMemberNo()))
-					return;
+				if(!VISITOR.equals(getMemberNo())) {
+					(new PromptBox()).open("退出登录");//还要修改数据库
+					setMemberNo(VISITOR);
+					setHeadPortrait("src/team/ecust/she/resource/image/unknown.jpg");
+					setNickname("未登录...");
+				}
 				Login login = new Login();
 				showInCard(login);
 				login.display();
@@ -448,20 +453,7 @@ public final class Index {
 		content.add(myInfo);
 		
 		JButton modifyInfo = new JButton("编辑信息");
-		modifyInfo.addMouseListener(new MouseAdapter() {
-			@Override
-			public void mouseEntered(MouseEvent e) {
-				modifyInfo.setBackground(Colors.TOP_BAR_BACKGROUND.getColor());
-			}
-			@Override
-			public void mouseExited(MouseEvent e) {
-				modifyInfo.setBackground(Colors.LEFT_CONTENT_BACKGROUND.getColor());
-			}
-			@Override
-			public void mouseClicked(MouseEvent e) {
-				
-			}
-		});
+		modifyInfo.addMouseListener(new EditMineInfo<JButton>(modifyInfo));
 		modifyInfo.setBorder(null);
 		modifyInfo.setFont(Fonts.LEFT_CONTENT_OPTION.getFont());
 		modifyInfo.setBackground(Colors.LEFT_CONTENT_BACKGROUND.getColor());
@@ -793,7 +785,7 @@ public final class Index {
 					}
 				}, 2000);
 			}
-		}, 1000);
+		}, 1500);
 	}
 	
 	/**显示高清头像。*/
@@ -825,6 +817,7 @@ public final class Index {
 	 */
 	public void setHeadPortrait(Image image) {
 		headPortrait.setPhoto(image);
+		headPortrait.repaint();
 	}
 	
 	public void setHeadPortrait(String absolutepath) {
@@ -845,7 +838,7 @@ public final class Index {
 	 */
 	public void setNickname(String name) {
 		if(name == null) 
-			name = "没有名字";
+			name = "你的名字";
 		StringBuffer buffer = new StringBuffer(name);
 		while(buffer.length() < 5) {
 			buffer.append(' ');

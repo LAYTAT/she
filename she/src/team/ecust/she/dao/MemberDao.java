@@ -75,8 +75,9 @@ public final class MemberDao extends AbstractDao{
 			member.setMailbox(result.getString(8));
 			member.setSignature(result.getString(9));
 			ImageTool picture = new ImageTool("myHeadPortrait.jpg");
+			picture.setImagePath(picture.getAbsolutePath());//设置为绝对路径
 			picture.saveImage(result.getBinaryStream(10));
-			member.setHeadPortrait(picture.getAbsolutePath());
+			member.setHeadPortrait(picture.getImagePath());
 			return member;
 		} catch (SQLException e) {
 			setMessage("数据中断传输");
@@ -84,6 +85,82 @@ public final class MemberDao extends AbstractDao{
 			closeStatement(state);
 		}
 		return null;
+	}
+	
+	public Member getMemberToEdit(String memberNo) {
+		String sql = "select cipher,nickname,address,phone,mailbox,signature,headPortrait"
+				+ " from Member where memberNo = '" + memberNo + "'";
+		Statement state = getStatement();
+		ResultSet result = getResult(state, sql);
+		if(result == null) {//查询出现异常 
+			closeStatement(state);
+			return null;
+		}
+		try {
+			result.next();
+		} catch (SQLException e) {
+			setMessage("结果出错");
+			return null;
+		}
+		Member member = new Member(memberNo);
+		try {
+			member.setCipher(result.getString(1));
+			member.setNickname(result.getString(2));
+			member.setAddress(result.getString(3));
+			member.setPhone(result.getString(4));
+			member.setMailbox(result.getString(5));
+			member.setSignature(result.getString(6));
+			ImageTool picture = new ImageTool("myHeadPortrait.jpg");
+			picture.setImagePath(picture.getAbsolutePath());//设置为绝对路径
+			picture.saveImage(result.getBinaryStream(7));
+			member.setHeadPortrait(picture.getImagePath());
+			return member;
+		} catch (SQLException e) {
+			setMessage("数据中断传输");
+		} finally {
+			closeStatement(state);
+		}
+		return null;
+	}
+	
+	public boolean editMember(Member member) {
+		String sql = "update Member set nickname = ?, cipher = ?, phone = ?, mailbox = ?, address = ?,"
+				+ "signature = ?, headPortrait = ? where memberNo = '" + member.getMemberNo() + "'";
+		PreparedStatement state = getPreparedStatement(sql);
+		InputStream in = null;
+		try {
+			state.setString(1, member.getNickname());
+			state.setString(2, member.getCipher());
+			state.setString(3, member.getPhone());
+			state.setString(4, member.getMailbox());
+			state.setString(5, member.getAddress());
+			state.setString(6, member.getSignature());
+			ImageTool tool = new ImageTool();
+			tool.setImagePath(member.getHeadPortrait());
+			tool.setImagePath(tool.getAbsolutePath());
+			if(!tool.isExisted()) {
+				state.setBinaryStream(7, null, 0);
+				state.executeUpdate();
+				return true;
+			}
+			in = tool.readImage();
+			state.setBinaryStream(7, in, in.available());
+			state.executeUpdate();
+			return true;
+		} catch (SQLException e1) {
+			setMessage("数据中断传输");
+		} catch (IOException e2) {
+			setMessage("数据流出现问题");
+		} finally {
+			closeStatement(state);
+			if(in != null)
+				try {
+					in.close();
+				} catch (IOException e) {
+					setMessage("数据流关闭失败");
+				}
+		}
+		return false;
 	}
 	
 	/**
@@ -116,44 +193,5 @@ public final class MemberDao extends AbstractDao{
 			closeStatement(state);
 		}
 		return false;
-	}
-	
-	/**
-	 * <p>往会员表里添加会员数组记录。
-	 * <p>为空的数组元素将被忽略，既不会存入表中，也不会报错！！！！
-	 * <p>一个非空数组元素将只存入为非空对象的属性，空对象属性将忽略，为默认值或空值。
-	 * <p>但表中的主属性和非空属性为空或者已存在则不插入，且跳过没有提示。
-	 * <p>另一种实现方式是通过传可变个数参数进来，只不过那样model里的内容就要加上属性转换等。
-	 * @param k[] 需要添加的会员对象数组
-	 * @return 判断的结果，插入成功返回true，失败返回false
-	 */
-	public boolean saveItems(Member[] k) {
-		if(k == null) {
-			setMessage("会员数组为空");
-			return false;
-		}
-		int number = k.length;
-		StringBuffer sql = null;
-		for(int i = 0; i < number; i++) {
-			if(k[i] == null || k[i].getMemberNo() == null || existItem(k[i].getMemberNo()))
-				continue;
-			sql = new StringBuffer("insert into Member (memberNo, headPortrait) values (?, ?)");
-			PreparedStatement state = getPreparedStatement(sql.toString());
-			try {
-				ImageTool picture = new ImageTool("login.jpg");
-				InputStream in = picture.readImage();
-				state.setString(1, "10161831");
-				state.setBinaryStream(2, in, in.available());
-				state.executeUpdate();
-				closePreparedStatement(state);
-				in.close();
-				return true;
-			} catch (SQLException e) {
-				System.err.println("参数错误");
-			} catch (IOException e) {
-				System.err.println("输入流出错");
-			}
-		}
-		return true;
 	}
 }
