@@ -69,6 +69,17 @@ public enum Colors {
 	MODIFY_INFO_COMBOC_FOREGROUND(new Color(200, 200, 200)),
 	/**编辑个人信息界面的按钮背景色*/
 	MODIFY_INFO_BUTTON_BACKGROUND(new Color(40, 150, 250)),
+	
+	/**消息界面分割线前景色*/
+	MESSAGES_SEVERANCE(new Color(50, 100, 180)),
+	/**消息界面模式选择背景色*/
+	MESSAGES_MODE_OPTIONS_BACKGROUND(new Color(250, 140, 50)),
+	/**消息界面聊天窗口背景色*/
+	MESSAGES_WINDOW_BACKGROUND(new Color(100, 100, 100)),
+	/**消息界面发送框发送按钮背景色*/
+	MESSAGES_SEND_BUTTON_BACKGROUND(new Color(40, 150, 250)),
+	/**消息界面发送框举报按钮背景色*/
+	MESSAGES_TIPOFF_BUTTON_BACKGROUND(new Color(250, 50, 50)),
 	;
 	
 	/**枚举的颜色变量*/

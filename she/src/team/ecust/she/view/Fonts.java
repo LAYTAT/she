@@ -38,6 +38,13 @@ public enum Fonts {
 	MODIFY_INFO_LEFT_LABEL(new Font("微软雅黑", Font.PLAIN, 22)),
 	/**编辑个人信息界面左侧输入框的字体*/
 	MODIFY_INFO_LEFT_TEXT(new Font("黑体", Font.PLAIN, 22)),
+	
+	/**消息界面标题字体*/
+	MESSAGES_TITLE(new Font("微软雅黑", Font.PLAIN, 24)),
+	/**消息界面发送文本框的字体*/
+	MESSAGES_SEND_TEXT(new Font("宋体", Font.PLAIN, 24)),
+	/**消息界面发送框按钮的字体*/
+	MESSAGES_SEND_BUTTON(new Font("黑体", Font.PLAIN, 20)),
 	;
 	
 	/**枚举的字体变量*/

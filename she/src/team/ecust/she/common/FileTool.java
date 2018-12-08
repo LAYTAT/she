@@ -54,6 +54,41 @@ public final class FileTool {
 	public String getFilePath() {
 		return filepath;
 	}
+	
+	/**
+	 * <p>获取当前文件的总共行数。
+	 * <p>如果文件不存在或无效路径都返回0
+	 * @return 行数
+	 */
+	public int getAllLines() {
+		File file = null;
+        try {
+			file = new File(filepath);//创建文件对象
+		} catch (NullPointerException e) {
+			System.err.println("->该文件路径为null");
+			return 0;
+		}
+        BufferedReader reader = null;//文件读取对象
+        try {
+            reader = new BufferedReader(new FileReader(file));
+            for(int i = 1; ; i++) {
+            	if(reader.readLine() == null)//达到文件末端
+            		return i;
+            }
+        } catch (FileNotFoundException e1) {  
+        	System.err.println("->该文件不存在：" + filepath);
+        } catch (IOException e2) {
+        	System.err.println("->读取该文件时出现IO错误：" + filepath);
+		} finally {  
+            if (reader != null)
+                try {
+                	reader.close();
+                } catch (IOException e3) {
+                	System.err.println("->文件流关闭失败");
+                }
+        }
+        return 0;
+	}
 
 	/**
 	 * <p>读取并返回指定文件指定行的内容，不包含换行符。

@@ -5,10 +5,13 @@ import java.awt.EventQueue;
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 
-import team.ecust.she.controller.LoginIn;
 import team.ecust.she.controller.EditMineInfo;
+import team.ecust.she.controller.InitializeAndUpdate;
 import team.ecust.she.controller.Search;
+import team.ecust.she.controller.UploadDemandGoodsInfo;
+import team.ecust.she.controller.UploadIdleGoodsInfo;
 import team.ecust.she.controller.ViewMineInfo;
+import team.ecust.she.controller.ViewMineMessages;
 import team.ecust.she.view.PromptBox.Tips;
 
 import java.awt.Toolkit;
@@ -26,7 +29,6 @@ import com.wis.pack.component.Photo;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.Timer;
-import java.util.TimerTask;
 import java.awt.FlowLayout;
 import java.awt.GridLayout;
 import java.awt.Image;
@@ -111,7 +113,8 @@ public final class Index {
 		readMessage = true;
 		memberNo = "";
 		initialize();
-		readMessagesFromDataBase(1000);
+		(new Timer()).schedule(new InitializeAndUpdate(true), 1500);//初始化联机内容
+		(new Timer()).schedule(new InitializeAndUpdate(false), 2000, 2000);//不断更新消息
 	}
 
 	/**
@@ -461,22 +464,7 @@ public final class Index {
 		content.add(modifyInfo);
 		
 		JButton uploadIdleGoods = new JButton("上传闲置");
-		uploadIdleGoods.addMouseListener(new MouseAdapter() {
-			@Override
-			public void mouseEntered(MouseEvent e) {
-				uploadIdleGoods.setBackground(Colors.TOP_BAR_BACKGROUND.getColor());
-			}
-			@Override
-			public void mouseExited(MouseEvent e) {
-				uploadIdleGoods.setBackground(Colors.LEFT_CONTENT_BACKGROUND.getColor());
-			}
-			@Override
-			public void mouseClicked(MouseEvent e) {
-				UploadIdleGoods uploadIdleGoods = new UploadIdleGoods();
-				showInCard(uploadIdleGoods);
-				uploadIdleGoods.display();
-			}
-		});
+		uploadIdleGoods.addMouseListener(new UploadIdleGoodsInfo<JButton>(uploadIdleGoods));
 		uploadIdleGoods.setBorder(null);
 		uploadIdleGoods.setFont(Fonts.LEFT_CONTENT_OPTION.getFont());
 		uploadIdleGoods.setBackground(Colors.LEFT_CONTENT_BACKGROUND.getColor());
@@ -484,16 +472,7 @@ public final class Index {
 		content.add(uploadIdleGoods);
 		
 		JButton uploadDemandGoods = new JButton("添加愿望");
-		uploadDemandGoods.addMouseListener(new MouseAdapter() {
-			@Override
-			public void mouseEntered(MouseEvent e) {
-				uploadDemandGoods.setBackground(Colors.TOP_BAR_BACKGROUND.getColor());
-			}
-			@Override
-			public void mouseExited(MouseEvent e) {
-				uploadDemandGoods.setBackground(Colors.LEFT_CONTENT_BACKGROUND.getColor());
-			}
-		});
+		uploadDemandGoods.addMouseListener(new UploadDemandGoodsInfo<JButton>(uploadDemandGoods));
 		uploadDemandGoods.setBorder(null);
 		uploadDemandGoods.setFont(Fonts.LEFT_CONTENT_OPTION.getFont());
 		uploadDemandGoods.setBackground(Colors.LEFT_CONTENT_BACKGROUND.getColor());
@@ -501,16 +480,7 @@ public final class Index {
 		content.add(uploadDemandGoods);
 		
 		JButton messages = new JButton("消息记录");
-		messages.addMouseListener(new MouseAdapter() {
-			@Override
-			public void mouseEntered(MouseEvent e) {
-				messages.setBackground(Colors.TOP_BAR_BACKGROUND.getColor());
-			}
-			@Override
-			public void mouseExited(MouseEvent e) {
-				messages.setBackground(Colors.LEFT_CONTENT_BACKGROUND.getColor());
-			}
-		});
+		messages.addMouseListener(new ViewMineMessages<JButton>(messages));
 		messages.setBorder(null);
 		messages.setFont(Fonts.LEFT_CONTENT_OPTION.getFont());
 		messages.setBackground(Colors.LEFT_CONTENT_BACKGROUND.getColor());
@@ -761,31 +731,6 @@ public final class Index {
 		softinfo.setBackground(Colors.LEFT_CONTENT_BACKGROUND.getColor());
 		softinfo.setIcon(new ImageIcon(Index.class.getResource("/team/ecust/she/resource/image/softinfo.png")));
 		content.add(softinfo);
-	}
-	
-	/**
-	 * <p>每隔一段时间从数据库读取消息，并处理。
-	 * @param duration 间隔时间，单位为毫秒
-	 */
-	private void readMessagesFromDataBase(int duration) {
-		Timer dynamic = new Timer();
-		dynamic.schedule(new TimerTask() {
-			@Override
-			public void run() {
-				Login login = new Login();
-				showInCard(login);
-				login.display();
-				login.repaint();
-				if(login.autoLogin())
-					LoginIn.doIt(login);
-				dynamic.schedule(new TimerTask() {
-					@Override
-					public void run() {
-						updateMessages(true);
-					}
-				}, 2000);
-			}
-		}, 1500);
 	}
 	
 	/**显示高清头像。*/

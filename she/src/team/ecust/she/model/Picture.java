@@ -3,7 +3,7 @@ package team.ecust.she.model;
 
 
 /**图像模型类，对应数据库里的图像表。*/
-public final class Pictrue {
+public final class Picture {
 	private String idleGoodsNo;
 	private String photoNo;
 	private String photo;
@@ -13,7 +13,7 @@ public final class Pictrue {
 	 * @param idleGoodsNo 闲置编号
 	 * @param photoNo 图片编号
 	 */
-	public Pictrue(String idleGoodsNo,String photoNo){
+	public Picture(String idleGoodsNo,String photoNo){
 		this.idleGoodsNo=idleGoodsNo;
 		this.photoNo=photoNo;
 		this.photo=null;
