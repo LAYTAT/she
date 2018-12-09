@@ -201,6 +201,17 @@ public final class Member {
 		}
 	}
 	
+	public String switchStateToChinese() {
+		if(state == null)
+			return null;
+		switch (state) {
+		case OFFLINE: return "离线";
+		case ONLINE:  return "在线";
+		case FROZEN:  return "冻结";
+		default: return null;
+		}
+	}
+	
 	/**
 	 * <p>根据会员状态字符串改变对应对象的状态枚举属性。
 	 * @param state 需要转换的状态字符串，为空对象或不合法则不改变对象的属性

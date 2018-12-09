@@ -2,8 +2,8 @@ package team.ecust.she.view;
 
 import java.awt.BorderLayout;
 import java.awt.CardLayout;
+import java.awt.Color;
 import java.awt.Component;
-import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.GridLayout;
 
@@ -15,8 +15,7 @@ import javax.swing.border.LineBorder;
 
 import com.wis.pack.component.Photo;
 
-import team.ecust.she.model.DemandGoods;
-import team.ecust.she.model.IdleGoods;
+import team.ecust.she.controller.ViewMineElseInfo;
 import team.ecust.she.model.Member;
 import team.ecust.she.model.Member.Gender;
 
@@ -24,18 +23,27 @@ import javax.swing.JTextPane;
 import javax.swing.border.TitledBorder;
 import javax.swing.SwingConstants;
 import javax.swing.border.MatteBorder;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
 
 /**我的信息界面类。*/
 @SuppressWarnings("serial")
 public final class MineInfo extends JPanel {
+	private String memberNo;
+	
 	/**选项卡片*/
 	private JPanel card;
 	
+	public String getMemberNo() {
+		return memberNo;
+	}
+
+	public void setMemberNo(String memberNo) {
+		this.memberNo = memberNo;
+	}
+
 	/**初始化，设置卡片为空对象。 */
 	public MineInfo() {
 		card = null;
+		//display(null);
 	}
 	
 	/**
@@ -44,12 +52,10 @@ public final class MineInfo extends JPanel {
 	 * @param member 需要显示信息的会员对象，可以为空，但啥信息也不显示，之后调用其他方法也不显示。
 	 */
 	public void display(Member member) {
-		if(member == null)
-			return;
-		
+		setMemberNo(member.getMemberNo());
 		int width = getWidth();
 		int height = getHeight();
-		setLayout(new BorderLayout());//使用边界布局
+		setLayout(new BorderLayout(0, 20));//使用边界布局
 		
 		JPanel myInfo = new JPanel(new BorderLayout(10, 0));//设置我的信息面板的布局和水平间距
 		myInfo.setPreferredSize(new Dimension(width, 340));//固定信息面板高度
@@ -76,7 +82,7 @@ public final class MineInfo extends JPanel {
 		nickname.setForeground(Colors.MINE_INFO_TITLE_FOREGROUND.getColor());
 		firstRow.add(nickname);
 		
-		JLabel credit = new JLabel(member.getCredit() == Member.NULL_CREDIT ? "信用分：" : "信用分：" + member.getCredit());//获取信用分
+		JLabel credit = new JLabel("信用分：" + member.getCredit());//获取信用分
 		credit.setIcon(new ImageIcon(MineInfo.class.getResource("/team/ecust/she/resource/image/credit.png")));
 		credit.setFont(Fonts.MINE_INFO_TITLE.getFont());
 		credit.setForeground(Colors.MINE_INFO_TITLE_FOREGROUND.getColor());
@@ -90,7 +96,7 @@ public final class MineInfo extends JPanel {
 		realName.setForeground(Colors.MINE_INFO_DETAILS_FOREGROUND.getColor());
 		secondRow.add(realName);
 		
-		JLabel address = new JLabel("地址：" + member.getAddress());
+		JLabel address = new JLabel(member.getAddress() == null ? "地址：" : "地址：" + member.getAddress());
 		address.setFont(Fonts.MINE_INFO_DETAILS.getFont());
 		address.setForeground(Colors.MINE_INFO_DETAILS_FOREGROUND.getColor());
 		secondRow.add(address);
@@ -100,12 +106,12 @@ public final class MineInfo extends JPanel {
 		profession.setForeground(Colors.MINE_INFO_DETAILS_FOREGROUND.getColor());
 		secondRow.add(profession);
 		
-		JLabel grade = new JLabel(member.getMemberNo() == null ? "入学年份：" : "入学年份：20" + member.getMemberNo().substring(2, 4));//显示年份
+		JLabel grade = new JLabel("入学年份：20" + member.getMemberNo().substring(2, 4));//显示年份
 		grade.setFont(Fonts.MINE_INFO_DETAILS.getFont());
 		grade.setForeground(Colors.MINE_INFO_DETAILS_FOREGROUND.getColor());
 		secondRow.add(grade);
 		
-		JLabel phoneNo = new JLabel("电话：" + member.getPhone());
+		JLabel phoneNo = new JLabel(member.getPhone() == null ? "电话：" : "电话：" + member.getPhone());
 		phoneNo.setFont(Fonts.MINE_INFO_DETAILS.getFont());
 		phoneNo.setForeground(Colors.MINE_INFO_DETAILS_FOREGROUND.getColor());
 		secondRow.add(phoneNo);
@@ -126,100 +132,44 @@ public final class MineInfo extends JPanel {
 		thirdRow.setBackground(Colors.MINE_INFO_STATEMENT_BACKGROUND.getColor());
 		wordInfo.add(thirdRow, BorderLayout.SOUTH);
 		
-		JPanel options = new JPanel(new GridLayout(0, 3, 1, 0));//选项面板
-		options.setBorder(new MatteBorder(1, 0, 1, 0, Colors.MINE_INFO_OPTIONS_BORDER.getColor()));//设置分割线
+		JPanel options = new JPanel(new GridLayout(0, 4, 2, 0));//选项面板
+		options.setBackground(Color.darkGray);
+		options.setBorder(new LineBorder(Color.darkGray, 2));//设置分割线
 		add(options, BorderLayout.CENTER);
 		
-		JLabel mineUpload = new JLabel("我的上传");
-		mineUpload.addMouseListener(new MouseAdapter() {
-			@Override
-			public void mouseEntered(MouseEvent e) {
-				mineUpload.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-				mineUpload.setBackground(Colors.TOP_BAR_BACKGROUND.getColor());
-			}
-			@Override
-			public void mouseExited(MouseEvent e) {
-				mineUpload.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
-				mineUpload.setBackground(Colors.DEFAULT_BACKGROUND.getColor());
-			}
-		});
-		mineUpload.setOpaque(true);//打开背景色
-		mineUpload.setFont(Fonts.MINE_INFO_OPTIONS.getFont());
-		mineUpload.setHorizontalAlignment(SwingConstants.CENTER);
-		options.add(mineUpload);
+		JLabel mineIdle = new JLabel("我的闲置");
+		mineIdle.addMouseListener(new ViewMineElseInfo<JLabel>(mineIdle, this, 1));
+		mineIdle.setOpaque(true);//打开背景色
+		mineIdle.setFont(Fonts.MINE_INFO_OPTIONS.getFont());
+		mineIdle.setHorizontalAlignment(SwingConstants.CENTER);
+		options.add(mineIdle);
+		
+		JLabel mineDemand = new JLabel("我的心愿");
+		mineDemand.addMouseListener(new ViewMineElseInfo<JLabel>(mineDemand, this, 2));
+		mineDemand.setOpaque(true);//打开背景色
+		mineDemand.setFont(Fonts.MINE_INFO_OPTIONS.getFont());
+		mineDemand.setHorizontalAlignment(SwingConstants.CENTER);
+		options.add(mineDemand);
 		
 		JLabel mineOrder = new JLabel("我的交易");
-		mineOrder.addMouseListener(new MouseAdapter() {
-			@Override
-			public void mouseEntered(MouseEvent e) {
-				mineOrder.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-				mineOrder.setBackground(Colors.TOP_BAR_BACKGROUND.getColor());
-			}
-			@Override
-			public void mouseExited(MouseEvent e) {
-				mineOrder.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
-				mineOrder.setBackground(Colors.DEFAULT_BACKGROUND.getColor());
-			}
-		});
+		mineOrder.addMouseListener(new ViewMineElseInfo<JLabel>(mineOrder, this, 3));
 		mineOrder.setOpaque(true);//打开背景色
 		mineOrder.setFont(Fonts.MINE_INFO_OPTIONS.getFont());
 		mineOrder.setHorizontalAlignment(SwingConstants.CENTER);
-		mineOrder.setBorder(new MatteBorder(0, 1, 0, 1, Colors.MINE_INFO_OPTIONS_BORDER.getColor()));
 		options.add(mineOrder);
 		
 		JLabel relativeComment = new JLabel("相关评价");
-		relativeComment.addMouseListener(new MouseAdapter() {
-			@Override
-			public void mouseEntered(MouseEvent e) {
-				relativeComment.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-				relativeComment.setBackground(Colors.TOP_BAR_BACKGROUND.getColor());
-			}
-			@Override
-			public void mouseExited(MouseEvent e) {
-				relativeComment.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
-				relativeComment.setBackground(Colors.DEFAULT_BACKGROUND.getColor());
-			}
-		});
+		relativeComment.addMouseListener(new ViewMineElseInfo<JLabel>(relativeComment, this, 4));
 		relativeComment.setOpaque(true);//打开背景色
 		relativeComment.setFont(Fonts.MINE_INFO_OPTIONS.getFont());
 		relativeComment.setHorizontalAlignment(SwingConstants.CENTER);
 		options.add(relativeComment);
 		
 		card = new JPanel(new CardLayout());//设置为卡片布局
-		card.setPreferredSize(new Dimension(width, height - 400));//固定选项信息面板高度
+		card.setPreferredSize(new Dimension(width, height - 430));//固定选项信息面板高度
 		add(card, BorderLayout.SOUTH);
-	}
-	
-	/**
-	 * 在卡片里展示我的上传。
-	 */
-	public void showMyUploads(IdleGoods k[], DemandGoods v[]) {
-		if(k != null) {
-			int rows = k.length;
-			for(int i = 0; i < rows; i++) {
-				//添加闲置物品列表
-			}
-		}
-		if(v != null) {
-			int rows = v.length;
-			for(int i = 0; i < rows; i++) {
-				//添加需求物品列表
-			}
-		}
-	}
-	
-	/**
-	 * 在卡片里展示我的交易。
-	 */
-	public void showMyTrades() {
 		
-	}
-	
-	/**
-	 * 在卡片里展示相关评论。
-	 */
-	public void showRelativeComments() {
-		
+		ViewMineElseInfo.viewIdle(this, false);
 	}
 	
 	/**

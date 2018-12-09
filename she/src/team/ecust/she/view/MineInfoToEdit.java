@@ -22,7 +22,7 @@ import javax.swing.JTextArea;
 import javax.swing.JButton;
 
 @SuppressWarnings("serial")
-public class EditInfo extends JPanel {
+public class MineInfoToEdit extends JPanel {
 	private JComboBox<String> floor;
 	private JComboBox<String> layer;
 	private JComboBox<String> order;
@@ -33,7 +33,7 @@ public class EditInfo extends JPanel {
 	private JTextArea statement;
 	private String headPortrait;
 
-	public EditInfo() {
+	public MineInfoToEdit() {
 		//display(null);
 	}
 	

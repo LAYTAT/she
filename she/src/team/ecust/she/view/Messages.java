@@ -13,8 +13,15 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.border.LineBorder;
 import javax.swing.border.MatteBorder;
 
+import team.ecust.she.common.FileTool;
+import team.ecust.she.dao.MemberDao;
+import team.ecust.she.model.Member;
+
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.io.File;
+import java.util.Vector;
+
 import javax.swing.JTextArea;
 import javax.swing.JButton;
 import javax.swing.JComponent;
@@ -36,8 +43,8 @@ public class Messages extends JPanel {
 	public String getObjectNo() {
 		return objectNo;
 	}
-	public void setObjectNo(String objectNo) {
-		object.setText("当前聊天对象：" + (this.objectNo = objectNo));
+	public void setObjectNickName(String objectNickName) {
+		object.setText("当前聊天对象：" + objectNickName);
 	}
 	public ChatRecord getChatRecord() {
 		return record;
@@ -55,6 +62,51 @@ public class Messages extends JPanel {
 			CardLayout card = (CardLayout)content.getLayout();
 			card.last(content);
 		}
+	}
+	
+	public void showChatList() {
+		File f = new File("src/team/ecust/she/resource/file/" + Index.getInstance().getMemberNo());
+		if(!f.exists())
+			f.mkdir();
+		File[] list = f.listFiles();
+		if(list == null)
+			return;
+		Vector<File> members = new Vector<File>();
+		for(int i = 0; i < list.length; i++) {
+			if(!list[i].isFile())
+				continue;
+			if(!list[i].getName().matches("10[0-9]{6}"))
+				continue;
+			members.add(list[i]);
+		}
+		if(members.size() == 0)
+			return;
+		JPanel panel = new JPanel();
+		if(members.size() < (getHeight() - 100)/100)
+			panel.setLayout(new GridLayout((getHeight() - 100)/100, 0, 0, 20));
+		else
+			panel.setLayout(new GridLayout(members.size(), 0, 0, 20));
+		FileTool tool = new FileTool("");
+		File file = null;
+		for(int i = 0; i < members.size(); i++) {
+			file = members.elementAt(i);
+			MessagesList messages = new MessagesList(file.getName());
+			panel.add(messages);
+			messages.display(this);
+			tool.setFilePath(file.getAbsolutePath());
+			messages.setBriefInfo(tool.readTheLine(tool.getAllLines() - 1));
+			MemberDao dao = new MemberDao();
+			Member member = dao.getMemberToEdit(file.getName());
+			if(member != null) {
+				messages.setHeadPortrait(member.getHeadPortrait());
+				messages.setNickName(member.getNickname());
+			}
+		}
+		showInContent(panel);
+	}
+	
+	public void showInformList() {
+		
 	}
 	
 	public Messages() {
@@ -96,8 +148,7 @@ public class Messages extends JPanel {
 				chat.setBackground(Colors.DEFAULT_BACKGROUND.getColor());
 				inform.setBackground(Colors.MESSAGES_MODE_OPTIONS_BACKGROUND.getColor());
 				options = true;
-				setObjectNo("10161831");
-				record.display(getObjectNo());
+				showInformList();
 			}
 			@Override
 			public void mouseExited(MouseEvent e) {
@@ -115,6 +166,7 @@ public class Messages extends JPanel {
 				inform.setBackground(Colors.DEFAULT_BACKGROUND.getColor());
 				chat.setBackground(Colors.MESSAGES_MODE_OPTIONS_BACKGROUND.getColor());
 				options = false;
+				showChatList();
 			}
 			@Override
 			public void mouseExited(MouseEvent e) {

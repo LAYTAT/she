@@ -3,7 +3,7 @@ package team.ecust.she.model;
 
 public final class Order {
 	/**订单价格的空常量值*/
-	public final static int NULL_PRICE=-1;
+	public final static float NULL_PRICE=-1f;
 	
 	/**订单状态的枚举:<br>对应''order','undetermined','succeed','fail'*/
 	public enum OrderState{
@@ -16,7 +16,7 @@ public final class Order {
 	private String orderNo;
 	private String memberNo;
 	private String idleGoodsNo;
-	private int price;
+	private float price;
 	private String deadline;
 	private String orderTime;
 	private String effectiveTime;
@@ -46,7 +46,6 @@ public final class Order {
 	public Order(String orderNo) {
 		this(orderNo,null, null);
 	}
-	
 	
 
 	/**
@@ -94,14 +93,14 @@ public final class Order {
 	/**
 	 * @return the price
 	 */
-	public int getPrice() {
+	public float getPrice() {
 		return price;
 	}
 
 	/**
 	 * @param price the price to set
 	 */
-	public void setPrice(int price) {
+	public void setPrice(float price) {
 		this.price = price;
 	}
 
@@ -176,6 +175,18 @@ public final class Order {
 		}
 	}
 	
+	public String switchStateToChinese() {
+		if(state == null)
+			return null;
+		switch (state) {
+		case ORDER: return "已下单";
+		case UNDERTERMINED: return "待完成";
+		case SUCCEED: return "交易成功";
+		case FAIL: return "交易失败";
+		default: return null;
+		}
+	}
+	
 	/**
 	 * @param state 需要转换的状态字符串，为空对象或不合法则不改变对象的属性
 	 */
@@ -193,7 +204,5 @@ public final class Order {
 		break;
 		default: return;
 		}
-	}
-	
-	
+	}	
 }

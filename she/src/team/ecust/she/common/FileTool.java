@@ -21,6 +21,7 @@ public final class FileTool {
 	public final static String SOFTWARE_INFO = "software";
 	/**登录配置文件的名称*/
 	public final static String LOGIN_SETTING = "login";
+	public final static String FILE_NAME = "filename";
 	
 	/**文件的相对路径或绝对路径*/
 	private String filepath;
@@ -33,6 +34,17 @@ public final class FileTool {
 	 */
 	public FileTool(String filename) {
 		this.setFilePath("src/team/ecust/she/resource/file/" + filename);
+	}
+	
+	public void createFolderIfNotExist() {
+		File file = null;
+		try {
+			file = new File(filepath);
+			if(!file.exists())
+				file.mkdir();
+		} catch (NullPointerException e) {
+			System.err.println("->文件对象路径为null");
+		}
 	}
 	
 	/**

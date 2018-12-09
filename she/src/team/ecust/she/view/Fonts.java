@@ -30,7 +30,7 @@ public enum Fonts {
 	/**我的信息界面个人说明面板标题的字体*/
 	MINE_INFO_STATEMENT_TITLE(new Font("黑体", Font.PLAIN, 16)),
 	/**我的信息界面选项面板的字体*/
-	MINE_INFO_OPTIONS(new Font("黑体", Font.PLAIN, 20)),
+	MINE_INFO_OPTIONS(new Font("黑体", Font.PLAIN, 24)),
 	
 	/**修改信息界面的标题字体*/
 	MODIFY_INFO_TITLE(new Font("黑体", Font.PLAIN, 30)),

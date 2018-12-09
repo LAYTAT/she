@@ -3,8 +3,8 @@ package team.ecust.she.model;
 /**闲置物品类 对应IdleGoods表
 */
 public final class IdleGoods {
-	public final static int NULL_SALE_PRICE=-1;
-	public final static int NULL_ORIGINAL_PRICE=-1;
+	public final static float NULL_SALE_PRICE= -1f;
+	public final static float NULL_ORIGINAL_PRICE=-1f;
 	public final static int NULL_DEGREE=-1;
 	/**ENUM state: 'ON_SALE','workoff','cancel'*/
 	public enum IdlegoodsState{
@@ -16,8 +16,8 @@ public final class IdleGoods {
 	private String idleGoodsNo;
 	private String memberNo;
 	private String idleGoodsName;
-	private int salePrice;
-	private int originalPrice;
+	private float salePrice;
+	private float originalPrice;
 	private int degree;
 	private String uploadTime;
 	private String note;
@@ -62,19 +62,19 @@ public final class IdleGoods {
 		this.idleGoodsName = idleGoodsName;
 	}
 
-	public int getSalePrice() {
+	public float getSalePrice() {
 		return salePrice;
 	}
 
-	public void setSalePrice(int salePrice) {
+	public void setSalePrice(float salePrice) {
 		this.salePrice = salePrice;
 	}
 
-	public int getOriginalPrice() {
+	public float getOriginalPrice() {
 		return originalPrice;
 	}
 
-	public void setOriginalPrice(int originalPrice) {
+	public void setOriginalPrice(float originalPrice) {
 		this.originalPrice = originalPrice;
 	}
 
@@ -119,16 +119,27 @@ public final class IdleGoods {
 		default: return null;
 		}
 	}
+	
+	public String switchIdleGoodsStateToChinese(){
+		if(state ==null)
+			return null;
+		switch(state){
+		case ON_SALE: return "在售";
+		case WORKOFF: return "售出";
+		case CANCEL: return "失效";
+		default: return null;
+		}
+	}
 	public void switchIdleGoodsStateToEnum(String state){
 		if(state==null)
 			return;
 		switch(state){
-		case "on sale": this.state=IdlegoodsState.ON_SALE;
-		break;
+		case "onsale": this.state=IdlegoodsState.ON_SALE;
+			break;
 		case "workoff": this.state=IdlegoodsState.WORKOFF;
-		break;
+			break;
 		case "cancel": this.state = IdlegoodsState.CANCEL;
-		break;
+			break;
 		default:return;
 		
 		}

@@ -122,6 +122,18 @@ public final class Inform {
 		}
 	}
 	
+	public String switchInformTypeToChinese(){
+		if(type == null) return null;
+		switch (type){
+		case CREDIT: 			return "信用分变化";
+		case NEW_MSG: 		return "新消息";
+		case CFM_ORDER: 	return "订单确认";
+		case ORDER_INFO:   return "订单信息";
+		case COMMENT:    return "用户评价";
+		default: return null;
+		}
+	}
+	
 	/**@param type 需要转换的系统通知类型String**/
 	public void switchTypeStringToEnum(String type){
 		if(type == null)
@@ -162,5 +174,4 @@ public final class Inform {
 		default: return;
 		}		
 	}
-	
 }

@@ -8,6 +8,9 @@ import javax.swing.JPanel;
 import javax.swing.JPasswordField;
 import javax.swing.JTextField;
 import javax.swing.border.EmptyBorder;
+
+import team.ecust.she.controller.RegisterMembership;
+
 import java.awt.Font;
 import java.awt.GridLayout;
 import javax.swing.JLabel;
@@ -44,30 +47,30 @@ public class Register extends JPanel {
 	 * 	<br>			  Email 学生电子邮箱
 	 * */
 
-	public String getStudentID(String MemNo){
+	public String getStudentID(){
 		 return studentID.getText();
 	}
 	public String getPassword(){
-		return password.getPassword().toString();
+		return new String(password.getPassword());
 	}
 	public String getCfmPassword(){
-		return passwordConfirm.getPassword().toString();
+		return new String(passwordConfirm.getPassword());
 	}
 	public String getID(){
 		return ID.getText();
 	}
 	public String getEmail(){
-		return Alias.getText();
+		return eMail.getText();
 	}
 	public String getAlias(){
-		return eMail.getText();
+		return Alias.getText();
 	}
 	
 	/**
 	 * Create the panel.
 	 */
 	public Register() {
-	display();
+	//display();
 	}
 	/*
 	 *显示注册界面 */
@@ -78,40 +81,40 @@ public class Register extends JPanel {
      int height =getHeight();		
 		
 	
-		int subPanelWidth = 490;
+		int subPanelWidth = 630;
 		int subPanelHeight =600;  
 			
 		setBorder(new EmptyBorder((height-subPanelHeight)/2, (width-subPanelWidth)/2, (height-subPanelHeight)/2, (width-subPanelWidth)/2));
 		//开始摆放部件
-		JPanel panel = new JPanel();   //主组件panel
-		panel.setPreferredSize(new Dimension(490, 630));
-		panel.setLocation(0, 0);
-		add(panel);
-		panel.setLayout(new GridLayout(11, 1, 10, 25));   //11行
+		JPanel mainPanel = new JPanel();   //主组件panel
+		mainPanel.setPreferredSize(new Dimension(630, 630));
+		mainPanel.setLocation(0, 0);
+		add(mainPanel);
+		mainPanel.setLayout(new GridLayout(11, 1, 10, 25));   //11行
 		
 		JPanel panel_Logo = new JPanel();
-		panel.add(panel_Logo);
+		mainPanel.add(panel_Logo);
 		
 		JLabel label_Logo = new JLabel("");
 		label_Logo.setIcon(new ImageIcon(Register.class.getResource("/team/ecust/she/resource/image/window.png")));
 		panel_Logo.add(label_Logo);
 		
 		JPanel panel_Hello = new JPanel();
-		panel.add(panel_Hello);
+		mainPanel.add(panel_Hello);
 		
 		JLabel lblsecndhandecust = new JLabel("  同学你好,欢迎你注册SecndHandEcust信息平台");
 		panel_Hello.add(lblsecndhandecust);
 		lblsecndhandecust.setFont(Fonts.LOGIN_MAIN_FONT.getFont());
 		
 		JPanel panel_Welcome = new JPanel();
-		panel.add(panel_Welcome);
+		mainPanel.add(panel_Welcome);
 		
 		JLabel IDTextLabel = new JLabel("请输入您的以下信息用于我们检验身份:");
 		panel_Welcome.add(IDTextLabel);
 		IDTextLabel.setFont(Fonts.LOGIN_MAIN_FONT.getFont());
 		
 		JPanel panel_ID = new JPanel();
-		panel.add(panel_ID);
+		mainPanel.add(panel_ID);
 		panel_ID.setLayout(new GridLayout(0, 2, 0, 0));
 		
 		JLabel IDLable = new JLabel("  身份证号码:");
@@ -124,7 +127,7 @@ public class Register extends JPanel {
 		ID.setColumns(20);
 		
 		JPanel stuIdPanel = new JPanel();
-		panel.add(stuIdPanel);
+		mainPanel.add(stuIdPanel);
 		stuIdPanel.setLayout(new GridLayout(0, 2, 0, 0));
 		
 		JLabel stuIDLabel = new JLabel("  学号:");
@@ -137,7 +140,7 @@ public class Register extends JPanel {
 		stuIdPanel.add(studentID);
 		
 		JPanel aliasPanel = new JPanel();
-		panel.add(aliasPanel);
+		mainPanel.add(aliasPanel);
 		aliasPanel.setLayout(new GridLayout(1, 0, 0, 0));
 		
 		JLabel aliasLabel = new JLabel("  昵称:");
@@ -150,7 +153,7 @@ public class Register extends JPanel {
 		aliasPanel.add(Alias);
 		
 		JPanel Email_panel = new JPanel();
-		panel.add(Email_panel);
+		mainPanel.add(Email_panel);
 		Email_panel.setLayout(new GridLayout(0, 2, 0, 0));
 		
 		JLabel label_email = new JLabel("  电子邮箱:");
@@ -163,10 +166,10 @@ public class Register extends JPanel {
 		Email_panel.add(eMail);
 		
 		JPanel pwdPanel = new JPanel();
-		panel.add(pwdPanel);
+		mainPanel.add(pwdPanel);
 		pwdPanel.setLayout(new GridLayout(0, 2, 0, 0));
 		
-		JLabel label_stuID = new JLabel("  登陆密码:");
+		JLabel label_stuID = new JLabel("  登陆密码(字母,数字 下滑线等):");
 		label_stuID.setFont(Fonts.LOGIN_MAIN_FONT.getFont());
 		pwdPanel.add(label_stuID);
 		
@@ -177,7 +180,7 @@ public class Register extends JPanel {
 		
 		
 		JPanel pwdConfirmPanel = new JPanel();
-		panel.add(pwdConfirmPanel);
+		mainPanel.add(pwdConfirmPanel);
 		pwdConfirmPanel.setLayout(new GridLayout(0, 2, 0, 0));
 		
 		JLabel pwdConfirmLabel = new JLabel("  确认密码:");
@@ -191,14 +194,16 @@ public class Register extends JPanel {
 		
 		
 		JPanel button_panel = new JPanel();
-		panel.add(button_panel);
+		mainPanel.add(button_panel);
 		button_panel.setLayout(new GridLayout(0, 2, 0, 0));
 		
 		JButton ReturnToLoginButton = new JButton("返回登陆");
 		ReturnToLoginButton.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
+				Index index = Index.getInstance();
 				Login login=new Login();
+				index.showInCard(login);
 				login.display();
 			}
 		});
@@ -209,6 +214,7 @@ public class Register extends JPanel {
 		
 		JButton IdentityCheckButton = new JButton("校验并注册");
 		IdentityCheckButton.setBackground(SystemColor.textHighlight);
+		IdentityCheckButton.addMouseListener(new RegisterMembership<Register>(this));
 		IdentityCheckButton.setFont(Fonts.LOGIN_MAIN_FONT.getFont());
 		IdentityCheckButton.setForeground(Color.WHITE);
 		button_panel.add(IdentityCheckButton);

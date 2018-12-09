@@ -193,7 +193,9 @@ public final class Login extends JPanel {
 		toRegisterLabel.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
-				// 切换到注册界面
+				Register register = new Register();
+				Index.getInstance().showInCard(register);
+				register.display();
 			}
 			@Override
 			public void mouseEntered(MouseEvent e) {

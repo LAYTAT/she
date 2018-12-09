@@ -5,6 +5,8 @@ import java.awt.EventQueue;
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 
+import team.ecust.she.common.FileTool;
+import team.ecust.she.controller.ClassifySearch;
 import team.ecust.she.controller.EditMineInfo;
 import team.ecust.she.controller.InitializeAndUpdate;
 import team.ecust.she.controller.Search;
@@ -65,6 +67,20 @@ public final class Index {
 			INDEX = new Index();
 		return INDEX;
 	}
+	
+	/**********************/
+	private static int filename = 0;
+	private static FileTool tool;
+	public static String getFileName() {
+		if(tool == null)
+			tool = new FileTool(FileTool.FILE_NAME);
+		if(filename == 0)
+			filename = Integer.valueOf(tool.readTheLine(1));
+		filename++;
+		tool.writeTheLine("" + filename, 1);
+		return "" + filename;
+	}
+	/**********************/
 	
 	/**当前皮肤的颜色对应的数字标识符*/
 	private int type;
@@ -193,8 +209,14 @@ public final class Index {
 		inputLayout.setVgap(0);//紧密贴合
 		inputLayout.setHgap(0);
 		
-		search = new JTextField();
+		search = new JTextField("搜索闲置物品");
 		search.setBorder(null);
+		search.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				search.selectAll();
+			}
+		});
 		search.setPreferredSize(new Dimension(240, 28));//适应大小
 		search.setFont(Fonts.TOP_BAR_SEARCH.getFont());
 		search.setBackground(colors.getColor().darker());
@@ -551,16 +573,7 @@ public final class Index {
 		content.add(variety);
 		
 		JButton books = new JButton("实体类书籍");
-		books.addMouseListener(new MouseAdapter() {
-			@Override
-			public void mouseEntered(MouseEvent e) {
-				books.setBackground(Colors.TOP_BAR_BACKGROUND.getColor());
-			}
-			@Override
-			public void mouseExited(MouseEvent e) {
-				books.setBackground(Colors.LEFT_CONTENT_BACKGROUND.getColor());
-			}
-		});
+		books.addMouseListener(new ClassifySearch<JButton>(books, "books"));
 		books.setBorder(null);
 		books.setFont(Fonts.LEFT_CONTENT_OPTION.getFont());
 		books.setBackground(Colors.LEFT_CONTENT_BACKGROUND.getColor());
@@ -568,16 +581,7 @@ public final class Index {
 		content.add(books);
 		
 		JButton devices = new JButton("电子类产品");
-		devices.addMouseListener(new MouseAdapter() {
-			@Override
-			public void mouseEntered(MouseEvent e) {
-				devices.setBackground(Colors.TOP_BAR_BACKGROUND.getColor());
-			}
-			@Override
-			public void mouseExited(MouseEvent e) {
-				devices.setBackground(Colors.LEFT_CONTENT_BACKGROUND.getColor());
-			}
-		});
+		devices.addMouseListener(new ClassifySearch<JButton>(devices, "devices"));
 		devices.setBorder(null);
 		devices.setFont(Fonts.LEFT_CONTENT_OPTION.getFont());
 		devices.setBackground(Colors.LEFT_CONTENT_BACKGROUND.getColor());
@@ -585,16 +589,7 @@ public final class Index {
 		content.add(devices);
 		
 		JButton dailyuse = new JButton("生活类用品");
-		dailyuse.addMouseListener(new MouseAdapter() {
-			@Override
-			public void mouseEntered(MouseEvent e) {
-				dailyuse.setBackground(Colors.TOP_BAR_BACKGROUND.getColor());
-			}
-			@Override
-			public void mouseExited(MouseEvent e) {
-				dailyuse.setBackground(Colors.LEFT_CONTENT_BACKGROUND.getColor());
-			}
-		});
+		dailyuse.addMouseListener(new ClassifySearch<JButton>(dailyuse, "dailyuse"));
 		dailyuse.setBorder(null);
 		dailyuse.setFont(Fonts.LEFT_CONTENT_OPTION.getFont());
 		dailyuse.setBackground(Colors.LEFT_CONTENT_BACKGROUND.getColor());
@@ -602,16 +597,7 @@ public final class Index {
 		content.add(dailyuse);
 		
 		JButton foods = new JButton("美食一条街");
-		foods.addMouseListener(new MouseAdapter() {
-			@Override
-			public void mouseEntered(MouseEvent e) {
-				foods.setBackground(Colors.TOP_BAR_BACKGROUND.getColor());
-			}
-			@Override
-			public void mouseExited(MouseEvent e) {
-				foods.setBackground(Colors.LEFT_CONTENT_BACKGROUND.getColor());
-			}
-		});
+		foods.addMouseListener(new ClassifySearch<JButton>(foods, "foods"));
 		foods.setBorder(null);
 		foods.setFont(Fonts.LEFT_CONTENT_OPTION.getFont());
 		foods.setBackground(Colors.LEFT_CONTENT_BACKGROUND.getColor());
@@ -619,16 +605,7 @@ public final class Index {
 		content.add(foods);
 		
 		JButton souvenir = new JButton("纪念装饰品");
-		souvenir.addMouseListener(new MouseAdapter() {
-			@Override
-			public void mouseEntered(MouseEvent e) {
-				souvenir.setBackground(Colors.TOP_BAR_BACKGROUND.getColor());
-			}
-			@Override
-			public void mouseExited(MouseEvent e) {
-				souvenir.setBackground(Colors.LEFT_CONTENT_BACKGROUND.getColor());
-			}
-		});
+		souvenir.addMouseListener(new ClassifySearch<JButton>(souvenir, "souvenir"));
 		souvenir.setBorder(null);
 		souvenir.setFont(Fonts.LEFT_CONTENT_OPTION.getFont());
 		souvenir.setBackground(Colors.LEFT_CONTENT_BACKGROUND.getColor());
@@ -636,16 +613,7 @@ public final class Index {
 		content.add(souvenir);
 		
 		JButton tools = new JButton("百宝箱工具");
-		tools.addMouseListener(new MouseAdapter() {
-			@Override
-			public void mouseEntered(MouseEvent e) {
-				tools.setBackground(Colors.TOP_BAR_BACKGROUND.getColor());
-			}
-			@Override
-			public void mouseExited(MouseEvent e) {
-				tools.setBackground(Colors.LEFT_CONTENT_BACKGROUND.getColor());
-			}
-		});
+		tools.addMouseListener(new ClassifySearch<JButton>(tools, "tools"));
 		tools.setBorder(null);
 		tools.setFont(Fonts.LEFT_CONTENT_OPTION.getFont());
 		tools.setBackground(Colors.LEFT_CONTENT_BACKGROUND.getColor());
@@ -653,16 +621,7 @@ public final class Index {
 		content.add(tools);
 		
 		JButton others = new JButton("其他物品");
-		others.addMouseListener(new MouseAdapter() {
-			@Override
-			public void mouseEntered(MouseEvent e) {
-				others.setBackground(Colors.TOP_BAR_BACKGROUND.getColor());
-			}
-			@Override
-			public void mouseExited(MouseEvent e) {
-				others.setBackground(Colors.LEFT_CONTENT_BACKGROUND.getColor());
-			}
-		});
+		others.addMouseListener(new ClassifySearch<JButton>(others, "others"));
 		others.setBorder(null);
 		others.setFont(Fonts.LEFT_CONTENT_OPTION.getFont());
 		others.setBackground(Colors.LEFT_CONTENT_BACKGROUND.getColor());

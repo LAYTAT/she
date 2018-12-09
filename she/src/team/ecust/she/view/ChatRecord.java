@@ -22,7 +22,7 @@ public class ChatRecord extends JPanel {
 	private Vector<RowWord> vector;
 	
 	public void addRecord(String word) {
-		//add
+		
 		repaint();
 	}
 	
@@ -64,13 +64,16 @@ public class ChatRecord extends JPanel {
 	}
 	
 	public void display(String objectNo) {
+		if(vector != null)
+			vector.clear();
+		
 		int width = getWidth();
 		int height = getHeight();
 		if(width == 0 || height == 0)//未加入容器中或者显示了也没作用
 			return;
 		vector = new Vector<RowWord>();//以10个为单位分配
 		String text = null;
-		FileTool file = new FileTool(objectNo);//新建软件信息文件对象
+		FileTool file = new FileTool(Index.getInstance().getMemberNo() + "/" + objectNo);//新建软件信息文件对象
 		
 		//int rows = file.getAllLines();
 		//if(rows*30 > height)//最好动态载入
@@ -105,6 +108,7 @@ public class ChatRecord extends JPanel {
 		});
 		repaint();
 	}
+	
 	/**
 	 * 同步的调整文字位置的方法。
 	 * @param sensibility 滚动灵敏度和方向，+往下，-往上

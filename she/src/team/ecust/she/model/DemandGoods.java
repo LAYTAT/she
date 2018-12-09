@@ -5,7 +5,7 @@ package team.ecust.she.model;
 public final class DemandGoods {
 /**新旧程度的空常量*/
 	public final static int NULL_DEGREE=-1;
-	public final static float NULL_PRICE=-1;
+	public final static float NULL_PRICE=-1f;
 /**需求物品的状态枚举:'done','cancel','matched','tobematched'*/
 	public enum DemandGoodsState {
 		DONE,
@@ -131,6 +131,7 @@ public void switchDemandGoodsStateToEnum(String state){
 		this.state=DemandGoodsState.TO_BE_MATCHED;
 	}
 }
+
 public String switchDemandGoodsStateToString(){
 	if(state==null)
 		return null;
@@ -142,7 +143,17 @@ public String switchDemandGoodsStateToString(){
 		default:return null;
 	}
 }
-
+public String switchDemandGoodsStateToChinese(){
+	if(state==null)
+		return null;
+	switch(state){
+		case DONE: return "成功完成";
+		case CANCEL:return "不再需要";
+		case MATCHED: return "可以完成";
+		case TO_BE_MATCHED: return "等待完成";
+		default:return null;
+	}
+}
 
 
 

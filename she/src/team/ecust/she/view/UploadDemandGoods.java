@@ -37,6 +37,10 @@ public final class UploadDemandGoods extends JPanel {
 	private JEditorPane note;
 	/** 需求物品种类**/
 	private JComboBox<String> varietyComboBox;
+	/**物品标签1*/
+	private JTextField labelTextField1;
+	/**物品标签2*/
+	private JTextField labelTextField2;
 	
 
 	/**
@@ -75,19 +79,23 @@ public final class UploadDemandGoods extends JPanel {
 				default: return null;
 						}
 	}
+	public String getLabel1(){
+			return labelTextField1.getText().toString();
+	}
+	public String getLabel2(){
+			return labelTextField2.getText().toString();
+	}
 	
 	/**
 	 * Create the panel.
 	 */
 	public UploadDemandGoods() {
 			//display();
+	      
 	}
 	public void display(){
-
-		//int width =1980;
-		//int height =1000;
 	    int width = getWidth();
-       int height =getHeight();			
+        int height =getHeight();			
 		int subPanelWidth = 850;
 		int subPanelHeight =850;  
 		
@@ -106,7 +114,7 @@ public final class UploadDemandGoods extends JPanel {
 	    JPanel mainPanel = new JPanel();
 	   // panel_8.setPreferredSize(new Dimension(1000, 750));
 	    panel.add(mainPanel);
-	    mainPanel.setLayout(new GridLayout(5, 1, 45, 25));
+	    mainPanel.setLayout(new GridLayout(6, 1, 45, 15));
 	    
 	    JLabel label = new JLabel(" 请在下方输入闲置物品的各项信息:");
 	    label.setBorder(new MatteBorder(0, 0, 1, 0, (Color) SystemColor.textHighlight));
@@ -196,7 +204,33 @@ public final class UploadDemandGoods extends JPanel {
 	    goodsNameTextField.setText("方便大家搜索到你的闲置");
 	    goodsNameTextField.setFont(Fonts.PLAIN_PROMPT_TEXT.getFont());
 	    goodsNameTextField.setColumns(10);
-	    goodsNamePanel.add(goodsNameTextField);;
+	    goodsNamePanel.add(goodsNameTextField);
+	    
+	    JPanel goodsLabelMainPanel = new JPanel();
+	    mainPanel.add(goodsLabelMainPanel);
+	    goodsLabelMainPanel.setLayout(new GridLayout(0, 2, 0, 0));
+	    
+	    JPanel goodsLabelSubPanel1 = new JPanel();
+	    goodsLabelMainPanel.add(goodsLabelSubPanel1);
+	    goodsLabelSubPanel1.setLayout(new GridLayout(0, 1, 0, 0));
+	    
+	    JLabel goodsLabelLabel = new JLabel(" 物品标签");
+	    goodsLabelSubPanel1.add(goodsLabelLabel);
+	    goodsLabelLabel.setFont(new Font("微软雅黑", Font.BOLD, 20));
+	    
+	    JPanel goodsLabelSubPanel2 = new JPanel();
+	    goodsLabelMainPanel.add(goodsLabelSubPanel2);
+	    goodsLabelSubPanel2.setLayout(new GridLayout(0, 2, 0, 0));
+	    
+	    labelTextField1 = new JTextField();
+	    labelTextField1.setFont(new Font("微软雅黑", Font.PLAIN, 25));
+	    labelTextField1.setColumns(10);
+	    goodsLabelSubPanel2.add(labelTextField1);
+	    
+	    labelTextField2 = new JTextField();
+	    labelTextField2.setFont(new Font("微软雅黑", Font.PLAIN, 25));
+	    labelTextField2.setColumns(10);
+	    goodsLabelSubPanel2.add(labelTextField2);;
 
 	    JPanel notePanel = new JPanel();
 	    panel.add(notePanel);

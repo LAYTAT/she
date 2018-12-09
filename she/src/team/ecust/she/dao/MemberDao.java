@@ -9,6 +9,7 @@ import java.sql.Statement;
 
 import team.ecust.she.common.ImageTool;
 import team.ecust.she.model.Member;
+import team.ecust.she.view.Index;
 
 /**
  * <p>会员的数据库访问对象，对象的属性为对应的空对象时会忽略改变或查询。
@@ -28,6 +29,7 @@ public final class MemberDao extends AbstractDao{
 			result.next();
 		} catch (SQLException e) {
 			setMessage("结果出错");
+			closeStatement(state);
 			return false;
 		}
 		try {
@@ -61,6 +63,7 @@ public final class MemberDao extends AbstractDao{
 			result.next();
 		} catch (SQLException e) {
 			setMessage("结果出错");
+			closeStatement(state);
 			return null;
 		}
 		Member member = new Member(memberNo);
@@ -74,7 +77,7 @@ public final class MemberDao extends AbstractDao{
 			member.setCredit(result.getInt(7));
 			member.setMailbox(result.getString(8));
 			member.setSignature(result.getString(9));
-			ImageTool picture = new ImageTool("myHeadPortrait.jpg");
+			ImageTool picture = new ImageTool(Index.getFileName() + ".jpg");
 			picture.setImagePath(picture.getAbsolutePath());//设置为绝对路径
 			picture.saveImage(result.getBinaryStream(10));
 			member.setHeadPortrait(picture.getImagePath());
@@ -100,6 +103,7 @@ public final class MemberDao extends AbstractDao{
 			result.next();
 		} catch (SQLException e) {
 			setMessage("结果出错");
+			closeStatement(state);
 			return null;
 		}
 		Member member = new Member(memberNo);
@@ -110,7 +114,7 @@ public final class MemberDao extends AbstractDao{
 			member.setPhone(result.getString(4));
 			member.setMailbox(result.getString(5));
 			member.setSignature(result.getString(6));
-			ImageTool picture = new ImageTool("myHeadPortrait.jpg");
+			ImageTool picture = new ImageTool(Index.getFileName() + ".jpg");
 			picture.setImagePath(picture.getAbsolutePath());//设置为绝对路径
 			picture.saveImage(result.getBinaryStream(7));
 			member.setHeadPortrait(picture.getImagePath());
@@ -182,8 +186,10 @@ public final class MemberDao extends AbstractDao{
 		sql.append("'");
 		Statement state = getStatement();
 		ResultSet result = getResult(state, sql.toString());//执行查询语句
-		if(result == null)//查询出现异常 
+		if(result == null) {//查询出现异常 
+			closeStatement(state);
 			return false;
+		}
 		try {
 			while(result.next())//含有记录则为true
 				return true;

@@ -6,6 +6,9 @@ import java.awt.event.MouseEvent;
 
 import javax.swing.JComponent;
 
+import team.ecust.she.view.Index;
+import team.ecust.she.view.PromptBox;
+
 /**
  * <p>实现顶栏搜索功能的业务控制器。
  * <p>基于闲置物品的模糊搜索。
@@ -25,9 +28,17 @@ public final class Search <K extends JComponent> extends MouseAdapter {
 		trigger = k;
 	}
 	
+	public synchronized static void doIt(String keyWord) {
+		if(keyWord == null || keyWord.equals("")) {
+			(new PromptBox()).open("输入为空");
+			return;
+		}
+		
+	}
+	
 	@Override
 	public void mouseClicked(MouseEvent e) {
-		//添加搜索业务代码
+		doIt(Index.getInstance().getSearchContent());
 	}
 	
 	@Override

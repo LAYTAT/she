@@ -8,7 +8,7 @@ import javax.swing.JComponent;
 import team.ecust.she.dao.MemberDao;
 import team.ecust.she.model.Member;
 import team.ecust.she.view.Colors;
-import team.ecust.she.view.EditInfo;
+import team.ecust.she.view.MineInfoToEdit;
 import team.ecust.she.view.Index;
 import team.ecust.she.view.Login;
 import team.ecust.she.view.PromptBox;
@@ -36,7 +36,7 @@ public class EditMineInfo <K extends JComponent> extends MouseAdapter {
 			(new PromptBox(Tips.ERROR)).open(dao.getMessage());
 			return;
 		}
-		EditInfo info = new EditInfo();
+		MineInfoToEdit info = new MineInfoToEdit();
 		index.showInCard(info);
 		info.display(member);
 	}

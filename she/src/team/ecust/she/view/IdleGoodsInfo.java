@@ -30,7 +30,7 @@ public class IdleGoodsInfo extends JPanel {
 	public void setIdleGoodsNo(String idleGoodsNo) {
 		this.idleGoodsNo = idleGoodsNo;
 	}
-
+	
 	public IdleGoodsInfo() {
 		setIdleGoodsNo("");
 		//display(null, null, null);
@@ -39,8 +39,9 @@ public class IdleGoodsInfo extends JPanel {
 	public void display(IdleGoods goods, GoodsVariety[] label, Picture[] picture) {
 		int width = getWidth();
 		int height = getHeight();
-		setLayout(new GridLayout(2, 0, 0, 20));
-		setBorder(new EmptyBorder(20, 20, 20, 20));
+		setBackground(Color.gray);
+		setLayout(new GridLayout(2, 0, 0, 2));
+		setBorder(new LineBorder(new Color(240, 240, 240), 20));
 		setIdleGoodsNo(goods.getIdleGoodsNo());
 		
 		JPanel above = new JPanel(new GridLayout(0, 2, 20, 0));
@@ -74,14 +75,14 @@ public class IdleGoodsInfo extends JPanel {
 		degree.setFont(new Font("宋体", Font.PLAIN, 22));
 		third.add(degree);
 		
-		JLabel state = new JLabel("商品状态：" + goods.switchIdleGoodsStateToString());
+		JLabel state = new JLabel("商品状态：" + goods.switchIdleGoodsStateToChinese());
 		state.setFont(new Font("宋体", Font.PLAIN, 22));
 		third.add(state);
 		
 		JLabel idlelabel = new JLabel();
 		String labeltext = "商品标签：";
 		for(int i = 0; i < label.length; i++)
-			labeltext += label[i].getKeyWord();
+			labeltext += label[i].getKeyWord() + "——";
 		idlelabel.setText(labeltext);
 		idlelabel.setForeground(new Color(0, 206, 209));
 		idlelabel.setFont(new Font("黑体", Font.PLAIN, 22));
@@ -103,6 +104,8 @@ public class IdleGoodsInfo extends JPanel {
 		button.add(contact, BorderLayout.CENTER);
 		
 		JTextArea right = new JTextArea(goods.getNote());
+		right.setEditable(false);
+		right.setFont(new Font("宋体", Font.PLAIN, 20));
 		right.setBackground(new Color(240, 240, 240));
 		LineBorder border = new LineBorder(new Color(100, 200, 100), 3);
 		right.setBorder(new TitledBorder(border, "\u8BE6\u7EC6\u8BF4\u660E", TitledBorder.CENTER,

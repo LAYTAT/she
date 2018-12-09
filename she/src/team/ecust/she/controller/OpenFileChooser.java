@@ -10,19 +10,19 @@ import javax.swing.JFileChooser;
 import com.wis.pack.component.Photo;
 
 import team.ecust.she.common.ImageTool;
-import team.ecust.she.view.EditInfo;
+import team.ecust.she.view.MineInfoToEdit;
 import team.ecust.she.view.PromptBox;
 
 public class OpenFileChooser <K extends JComponent> extends MouseAdapter {
 	private Photo photo;
-	private EditInfo info;
+	private MineInfoToEdit info;
 	
 	public OpenFileChooser(K k, Photo photo) {
-		this.info = (EditInfo)k;
+		this.info = (MineInfoToEdit)k;
 		this.photo = photo;
 	}
 	
-	public synchronized static void doIt(EditInfo k, Photo photo) {
+	public synchronized static void doIt(MineInfoToEdit k, Photo photo) {
 		JFileChooser fileChooser = new JFileChooser();
 		fileChooser.showOpenDialog(fileChooser);
 		
