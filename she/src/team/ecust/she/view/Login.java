@@ -34,6 +34,7 @@ public final class Login extends JPanel {
 	private JPasswordField pwdTextField;
 	private JCheckBox autoLoginCheckBox;
 	private JCheckBox remPwdCheckBox;
+	private JButton loginConfirmButton;
 	
 	//private Photo headPortrait;
 
@@ -62,6 +63,10 @@ public final class Login extends JPanel {
 	}
 	public boolean remeCipher() {
 		return remPwdCheckBox.isSelected();
+	}
+	
+	public void setConfirmButtonEnabled(boolean enable) {
+		loginConfirmButton.setEnabled(enable);
 	}
 	
 	
@@ -181,7 +186,7 @@ public final class Login extends JPanel {
 			}
 		});
 		
-		JButton loginConfirmButton = new JButton("登录");
+		loginConfirmButton = new JButton("登录");
 		loginConfirmButton.addMouseListener(new LoginIn<Login>(this));
 		loginConfirmButton.setBackground(SystemColor.textHighlight);
 		loginConfirmButton.setForeground(Color.WHITE);

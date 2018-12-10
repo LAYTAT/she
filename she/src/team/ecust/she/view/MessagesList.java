@@ -74,7 +74,8 @@ public class MessagesList extends JPanel {
 			public void mouseClicked(MouseEvent e) {
 				state.setForeground(new Color(240, 240, 240));
 				messages.getChatRecord().display(getMemberNo());
-				messages.setObjectNickName(getMemberNo());
+				messages.setObjectNo(getMemberNo());
+				messages.setObjectNickName(nickname.getText());
 			}
 			@Override
 			public void mouseEntered(MouseEvent e) {

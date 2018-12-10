@@ -7,6 +7,7 @@ import javax.swing.JTextArea;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.LineBorder;
 
+import team.ecust.she.controller.ContactSeller;
 import team.ecust.she.model.GoodsVariety;
 import team.ecust.she.model.IdleGoods;
 import team.ecust.she.model.Picture;
@@ -31,8 +32,8 @@ public class IdleGoodsInfo extends JPanel {
 		this.idleGoodsNo = idleGoodsNo;
 	}
 	
-	public IdleGoodsInfo() {
-		setIdleGoodsNo("");
+	public IdleGoodsInfo(String goodsNo) {
+		setIdleGoodsNo(goodsNo);
 		//display(null, null, null);
 	}
 	
@@ -42,7 +43,6 @@ public class IdleGoodsInfo extends JPanel {
 		setBackground(Color.gray);
 		setLayout(new GridLayout(2, 0, 0, 2));
 		setBorder(new LineBorder(new Color(240, 240, 240), 20));
-		setIdleGoodsNo(goods.getIdleGoodsNo());
 		
 		JPanel above = new JPanel(new GridLayout(0, 2, 20, 0));
 		add(above);
@@ -99,6 +99,7 @@ public class IdleGoodsInfo extends JPanel {
 		button.setLayout(new BorderLayout(0, 0));
 		
 		JButton contact = new JButton("联系卖家");
+		contact.addMouseListener(new ContactSeller(getIdleGoodsNo()));
 		contact.setBackground(new Color(30, 144, 255));
 		contact.setFont(new Font("黑体", Font.PLAIN, 22));
 		button.add(contact, BorderLayout.CENTER);
@@ -114,6 +115,7 @@ public class IdleGoodsInfo extends JPanel {
 		above.add(right);
 		
 		JPanel below = new JPanel(new GridLayout(0, 4, 10, 0));
+		below.setBorder(new EmptyBorder(10, 0, 0, 0));
 		add(below);
 		
 		for(int i = 0; i < picture.length; i++) {

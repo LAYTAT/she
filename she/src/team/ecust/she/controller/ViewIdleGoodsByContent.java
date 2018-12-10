@@ -6,6 +6,7 @@ import java.awt.event.MouseEvent;
 
 import javax.swing.JComponent;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 
 import team.ecust.she.dao.IdleGoodsDao;
 import team.ecust.she.model.GoodsVariety;
@@ -15,31 +16,29 @@ import team.ecust.she.view.GoodsList;
 import team.ecust.she.view.Index;
 import team.ecust.she.view.PromptBox;
 
-public final class ClassifySearch <K extends JComponent> extends MouseAdapter {
-	/**触发业务的组件类型K和实例trigger*/
+public final class ViewIdleGoodsByContent <K extends JComponent> extends MouseAdapter {
 	private K trigger;
-	private String keyWord;
-	
-	/**
-	 * <p>为实例k添加顶栏搜索这一业务控制器。
-	 * <p>不对参数做空值判断。
-	 * @param k 需要添加这一业务的组件
-	 */
-	public ClassifySearch(K k, String keyWord) {
+	private boolean choice;
+
+	public ViewIdleGoodsByContent(K k, boolean choice) {
 		trigger = k;
-		this.keyWord = keyWord;
+		this.choice = choice;
 	}
 	
-	public synchronized static void doIt(String keyWord) {
+	public synchronized static void doIt(boolean choice) {
 		IdleGoodsDao dao = new IdleGoodsDao();
-		IdleGoods[] goods = dao.getIdleGoodsBySearch(keyWord);
+		IdleGoods[] goods = null;
+		if(choice)
+			goods = dao.getIdleGoodsByHotDegree();
+		else
+			goods = dao.getIdleGoodsByLatestGoods();
 		if(goods == null || goods.length == 0) {
 			(new PromptBox()).open("没有记录");
 			return;
 		}
 		JPanel panel = new JPanel();
-		Index.getInstance().showInCard(panel);
-		if(panel.getHeight() > 120 * goods.length)
+		Index.getInstance().showInCard(new JScrollPane(panel));
+		if(panel.getHeight() > goods.length * 120)
 			panel.setLayout(new GridLayout(panel.getHeight()/120, 0, 0, 20));
 		else
 			panel.setLayout(new GridLayout(goods.length, 0, 0, 20));
@@ -49,12 +48,11 @@ public final class ClassifySearch <K extends JComponent> extends MouseAdapter {
 			panel.add(list);
 			list.displayIdleList(goods[i], variety);
 		}
-		panel.repaint();
 	}
 	
 	@Override
 	public void mouseClicked(MouseEvent e) {
-		doIt(keyWord);
+		doIt(choice);
 	}
 	
 	@Override

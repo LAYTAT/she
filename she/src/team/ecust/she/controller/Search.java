@@ -6,6 +6,7 @@ import java.awt.event.MouseEvent;
 
 import javax.swing.JComponent;
 
+import team.ecust.she.dao.GoodVareityDao;
 import team.ecust.she.view.Index;
 import team.ecust.she.view.PromptBox;
 
@@ -33,7 +34,9 @@ public final class Search <K extends JComponent> extends MouseAdapter {
 			(new PromptBox()).open("输入为空");
 			return;
 		}
-		
+		keyWord = keyWord.toLowerCase();
+		(new GoodVareityDao()).updateHotDegree(keyWord);
+		ClassifySearch.doIt(keyWord);
 	}
 	
 	@Override

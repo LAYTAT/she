@@ -43,6 +43,9 @@ public class Messages extends JPanel {
 	public String getObjectNo() {
 		return objectNo;
 	}
+	public void setObjectNo(String objectNo) {
+		this.objectNo = objectNo;
+	}
 	public void setObjectNickName(String objectNickName) {
 		object.setText("当前聊天对象：" + objectNickName);
 	}
@@ -109,8 +112,8 @@ public class Messages extends JPanel {
 		
 	}
 	
-	public Messages() {
-		options = true;
+	public Messages(boolean option) {
+		options = option;
 		objectNo = "";
 		//display();
 	}
@@ -132,7 +135,6 @@ public class Messages extends JPanel {
 		JLabel inform = new JLabel("系统通知");
 		inform.setFont(Fonts.MESSAGES_TITLE.getFont());
 		inform.setOpaque(true);
-		inform.setBackground(Colors.MESSAGES_MODE_OPTIONS_BACKGROUND.getColor());
 		inform.setHorizontalAlignment(SwingConstants.CENTER);
 		mode.add(inform);
 		
@@ -224,5 +226,13 @@ public class Messages extends JPanel {
 		tipoff.setFont(Fonts.MESSAGES_SEND_BUTTON.getFont());
 		tipoff.setBackground(Colors.MESSAGES_TIPOFF_BUTTON_BACKGROUND.getColor());
 		operate.add(tipoff);
+		
+		if(options) {
+			inform.setBackground(Colors.MESSAGES_MODE_OPTIONS_BACKGROUND.getColor());
+			showInformList();
+		} else {
+			chat.setBackground(Colors.MESSAGES_MODE_OPTIONS_BACKGROUND.getColor());
+			showChatList();
+		}
 	}
 }

@@ -36,11 +36,12 @@ public class GoodsList extends JPanel {
 		this.goodsNo = goodsNo;
 	}
 
-	public GoodsList() {
+	public GoodsList(String goodsNo) {
+		this.goodsNo = goodsNo;
 		//displayOthersDemandList(new DemandGoods(""), null);
 	}
 	
-	public void displayIdleList(IdleGoods goods, GoodsVariety[]variety, boolean self) {
+	public void displayIdleList(IdleGoods goods, GoodsVariety[]variety) {
 		setGoodsNo(goods.getIdleGoodsNo());
 		setPreferredSize(new Dimension(1000, 100));
 		setBorder(new LineBorder(Color.blue, 1));
@@ -62,7 +63,7 @@ public class GoodsList extends JPanel {
 				IdleGoods goods = dao.getIdleGoodsByIdleGoods(getGoodsNo());
 				GoodsVariety[] label = dao.getGoodsVarietyByGoods(getGoodsNo());
 				Picture[] picture = dao.getPictureByIdleGoods(getGoodsNo());
-				IdleGoodsInfo info = new IdleGoodsInfo();
+				IdleGoodsInfo info = new IdleGoodsInfo(getGoodsNo());
 				Index.getInstance().showInCard(info);
 				info.display(goods, label, picture);
 			}
@@ -305,6 +306,7 @@ public class GoodsList extends JPanel {
 		note.setBorder(new TitledBorder(new LineBorder(new Color(30, 144, 255),2), "\u8BE6\u7EC6\u4ECB\u7ECD",
 				TitledBorder.CENTER, TitledBorder.TOP, new Font("黑体", Font.PLAIN, 18), null));
 		note.setBackground(new Color(240, 240, 240));
+		note.setFont(new Font("宋体", Font.PLAIN, 22));
 		note.setEditable(false);
 		note.setLineWrap(true);
 		add(note);

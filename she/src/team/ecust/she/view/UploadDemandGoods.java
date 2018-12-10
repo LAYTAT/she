@@ -19,6 +19,7 @@ import javax.swing.JTextField;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.MatteBorder;
 
+import team.ecust.she.controller.UploadDemandController;
 
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
@@ -90,10 +91,13 @@ public final class UploadDemandGoods extends JPanel {
 	 * Create the panel.
 	 */
 	public UploadDemandGoods() {
-			//display();
+		//	display();
 	      
 	}
 	public void display(){
+
+//		int width =1980;
+//		int height =1000;
 	    int width = getWidth();
         int height =getHeight();			
 		int subPanelWidth = 850;
@@ -116,7 +120,7 @@ public final class UploadDemandGoods extends JPanel {
 	    panel.add(mainPanel);
 	    mainPanel.setLayout(new GridLayout(6, 1, 45, 15));
 	    
-	    JLabel label = new JLabel(" 请在下方输入闲置物品的各项信息:");
+	    JLabel label = new JLabel(" 请在下方输入需求物品的各项信息:");
 	    label.setBorder(new MatteBorder(0, 0, 1, 0, (Color) SystemColor.textHighlight));
 	    mainPanel.add(label);
 	    label.setFont(Fonts.BOLD_PROMPT_TEXT.getFont());
@@ -201,7 +205,7 @@ public final class UploadDemandGoods extends JPanel {
 	    		goodsNameTextField.selectAll();
 	    	}
 	    });
-	    goodsNameTextField.setText("方便大家搜索到你的闲置");
+	    goodsNameTextField.setText("方便大家了解你的需求");
 	    goodsNameTextField.setFont(Fonts.PLAIN_PROMPT_TEXT.getFont());
 	    goodsNameTextField.setColumns(10);
 	    goodsNamePanel.add(goodsNameTextField);
@@ -259,10 +263,11 @@ public final class UploadDemandGoods extends JPanel {
 	    note.setBorder(new MatteBorder(1, 1, 1, 1, (Color) new Color(0, 120, 215)));
 	    notePanel.add(note);
 	    note.setFont(Fonts.PLAIN_PROMPT_TEXT.getFont());
-	    note.setText("让大家更了解你的需求物品的要求(300字内)\r\n");
+	    note.setText("让大家更了解你的需求物品的要求(255字内)\r\n");
 	    note.setPreferredSize(new Dimension(300, 300));
 	    
 	    JButton confirmUploadButton = new JButton("确认上传");
+	    confirmUploadButton.addMouseListener(new UploadDemandController<UploadDemandGoods>(this));
 	    confirmUploadButton.addActionListener(new ActionListener() {
 	    	public void actionPerformed(ActionEvent e) {
 	    	}

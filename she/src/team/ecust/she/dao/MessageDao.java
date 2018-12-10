@@ -5,19 +5,20 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
-import team.ecust.she.model.Inform;
+import team.ecust.she.model.Message;
 
-public final class InformDao extends AbstractDao {
-	public InformDao() {
-		
+public class MessageDao extends AbstractDao {
+
+	public MessageDao() {
+		// TODO Auto-generated constructor stub
 	}
 	
-	public boolean updateInformState(String memberNo) {
-		return update("update inform set state = 'read' where memberNo = '" + memberNo + "'");
+	public boolean updateMessageState(String memberNo) {
+		return update("update message set state = 'read' where receiverNo = '" + memberNo + "'");
 	}
 	
-	public boolean hasUnreadInforms(String memberNo) {
-		String sql = "select*from inform where memberNo='" + memberNo + "' and state = 'toberead'";
+	public boolean hasUnreadMessages(String memberNo) {
+		String sql = "select*from message where receiverNo='" + memberNo + "' and state = 'toberead'";
 		Statement state = getStatement();
 		ResultSet result = getResult(state, sql);
 		if(result == null) {//查询出现异常 
@@ -35,8 +36,8 @@ public final class InformDao extends AbstractDao {
 		return false;
 	}
 	
-	public Inform[] getUnreadInforms(String memberNo) {
-		String sql = "select*from Inform where memberNo = '" + memberNo + "' and state = 'toberead'";
+	public Message[] getUnreadMessages(String memberNo) {
+		String sql = "select*from message where receiverNo = '" + memberNo + "' and state = 'toberead'";
 		Statement state = getStatement();
 		ResultSet result = getResult(state, sql);
 		if(result == null) {//查询出现异常 
@@ -53,14 +54,14 @@ public final class InformDao extends AbstractDao {
 			closeStatement(state);
 			return null;
 		}
-		Inform inform[] = new Inform[rows];
+		Message messages[] = new Message[rows];
 		try {
 			for(int i = 0; i < rows; i++) {
-				inform[i] = new Inform(result.getString(1));
-				inform[i].setMemberNo(result.getString(2));
-				inform[i].setSentTime(result.getString(3));
-				inform[i].switchTypeStringToEnum(result.getString(4));
-				inform[i].setContent(result.getString(5));
+				messages[i] = new Message(result.getString(1));
+				messages[i].setSenderNo(result.getString(2));
+				messages[i].setReceiverNo(result.getString(3));
+				messages[i].setSentTime(result.getString(4));
+				messages[i].setContent(result.getString(5));
 				if(!result.next())
 					break;
 			}
@@ -70,22 +71,22 @@ public final class InformDao extends AbstractDao {
 		} finally {
 			closeStatement(state);
 		}
-		if(updateInformState(memberNo))
-			return inform;
+		if(updateMessageState(memberNo))
+			return messages;
 		else
 			return null;
 	}
 	
 	/**不会传入状态*/
-	public boolean insertNewInform(Inform inform) {
-		String sql = "insert into Inform (informNo,memberNo,sentTime,type,content)values(?,?,?,?,?)";
+	public boolean insertNewMessage(Message message) {
+		String sql = "insert into message (messageNo,senderNo,receiverNo,sentTime,content)values(?,?,?,?,?)";
 		PreparedStatement state = getPreparedStatement(sql);
 		try {
-			state.setString(1, inform.getInformNo());
-			state.setString(2, inform.getMemberNo());
-			state.setString(3, inform.getSentTime());
-			state.setString(4, inform.switchInformTypeToString());
-			state.setString(5, inform.getContent());
+			state.setString(1, message.getMessageNo());
+			state.setString(2, message.getSenderNo());
+			state.setString(3, message.getReceiverNo());
+			state.setString(4, message.getSentTime());
+			state.setString(5, message.getContent());
 			state.executeUpdate();
 			return true;
 		} catch (SQLException e) {
@@ -96,10 +97,11 @@ public final class InformDao extends AbstractDao {
 		return false;
 	}
 	
-	public boolean existInform(String informNo) {
-		String sql = "select informNo from Inform where informNo = '" + informNo + "'";
+	public boolean existItem(Message message) {
+		String sql = "select messageNo from message where messageNo = '" + message.getMessageNo() +
+				"' and senderNo = '" + message.getSenderNo() + "' and receiverNo = '" + message.getReceiverNo() + "'";
 		Statement state = getStatement();
-		ResultSet result = getResult(state, sql);
+		ResultSet result = getResult(state, sql);//执行查询语句
 		if(result == null) {//查询出现异常 
 			closeStatement(state);
 			return false;

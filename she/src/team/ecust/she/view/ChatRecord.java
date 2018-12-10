@@ -81,6 +81,8 @@ public class ChatRecord extends JPanel {
 			text = file.readTheLine(i + 1);
 			if(text == null)
 				break;
+			if(text.equals(""))
+				continue;
 			RowWord word = new RowWord(text);
 			if(text.startsWith("[") && text.endsWith("]")) {
 				word.color = TIME_TITLE;

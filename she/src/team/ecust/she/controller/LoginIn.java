@@ -23,30 +23,36 @@ public class LoginIn <K extends JComponent> extends MouseAdapter {
 	}
 	
 	public synchronized static void doIt(Login login) {
+		login.setConfirmButtonEnabled(false);
 		Index index = Index.getInstance();
 		if(!Index.VISITOR.equals(index.getMemberNo())) {
 			(new PromptBox()).open("您已登录");
+			login.setConfirmButtonEnabled(true);
 			return;
 		}
 		String memberNo = login.getMemberNo();
 		String regex = "[1-9][0-9]{7}";
 		if(memberNo == null || !memberNo.matches(regex)) {
 			(new PromptBox()).open("会员号格式不对");
+			login.setConfirmButtonEnabled(true);
 			return;
 		}
 		String cipher = login.getPassword();
 		regex = "\\w{6,16}";//匹配任何字类字符，包括下划线。与"[A-Za-z0-9_]"等效。
 		if(cipher == null || !cipher.matches(regex)) {
 			(new PromptBox()).open("密码格式不对");
+			login.setConfirmButtonEnabled(true);
 			return;
 		}
 		MemberDao dao = new MemberDao();
 		if(!dao.validateCipher(memberNo, cipher)) {
 			(new PromptBox(Tips.ERROR)).open(dao.getMessage());
+			login.setConfirmButtonEnabled(true);
 			return;
 		}
 		if(!dao.loginIn(memberNo)) {
 			(new PromptBox(Tips.OFFLINE)).open(dao.getMessage());
+			login.setConfirmButtonEnabled(true);
 			return;
 		}
 		index.setNickname("登录中...");
@@ -63,6 +69,7 @@ public class LoginIn <K extends JComponent> extends MouseAdapter {
 				} catch (InterruptedException e) {
 					System.err.println("->线程被打断");
 				}
+				login.setConfirmButtonEnabled(true);
 				ViewMineInfo.doIt();
 			}
 		}, 1500);

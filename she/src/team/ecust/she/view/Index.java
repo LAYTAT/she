@@ -12,6 +12,8 @@ import team.ecust.she.controller.InitializeAndUpdate;
 import team.ecust.she.controller.Search;
 import team.ecust.she.controller.UploadDemandGoodsInfo;
 import team.ecust.she.controller.UploadIdleGoodsInfo;
+import team.ecust.she.controller.ViewDemandGoods;
+import team.ecust.she.controller.ViewIdleGoodsByContent;
 import team.ecust.she.controller.ViewMineInfo;
 import team.ecust.she.controller.ViewMineMessages;
 import team.ecust.she.view.PromptBox.Tips;
@@ -516,16 +518,7 @@ public final class Index {
 		content.add(recommand);
 		
 		JButton hotsale = new JButton("热卖物品");
-		hotsale.addMouseListener(new MouseAdapter() {
-			@Override
-			public void mouseEntered(MouseEvent e) {
-				hotsale.setBackground(Colors.TOP_BAR_BACKGROUND.getColor());
-			}
-			@Override
-			public void mouseExited(MouseEvent e) {
-				hotsale.setBackground(Colors.LEFT_CONTENT_BACKGROUND.getColor());
-			}
-		});
+		hotsale.addMouseListener(new ViewIdleGoodsByContent<JButton>(hotsale, true));
 		hotsale.setBorder(null);
 		hotsale.setFont(Fonts.LEFT_CONTENT_OPTION.getFont());
 		hotsale.setBackground(Colors.LEFT_CONTENT_BACKGROUND.getColor());
@@ -533,16 +526,7 @@ public final class Index {
 		content.add(hotsale);
 		
 		JButton latest = new JButton("最近更新");
-		latest.addMouseListener(new MouseAdapter() {
-			@Override
-			public void mouseEntered(MouseEvent e) {
-				latest.setBackground(Colors.TOP_BAR_BACKGROUND.getColor());
-			}
-			@Override
-			public void mouseExited(MouseEvent e) {
-				latest.setBackground(Colors.LEFT_CONTENT_BACKGROUND.getColor());
-			}
-		});
+		latest.addMouseListener(new ViewIdleGoodsByContent<JButton>(latest, false));
 		latest.setBorder(null);
 		latest.setFont(Fonts.LEFT_CONTENT_OPTION.getFont());
 		latest.setBackground(Colors.LEFT_CONTENT_BACKGROUND.getColor());
@@ -550,16 +534,7 @@ public final class Index {
 		content.add(latest);
 		
 		JButton wishwall = new JButton("心愿墙");
-		wishwall.addMouseListener(new MouseAdapter() {
-			@Override
-			public void mouseEntered(MouseEvent e) {
-				wishwall.setBackground(Colors.TOP_BAR_BACKGROUND.getColor());
-			}
-			@Override
-			public void mouseExited(MouseEvent e) {
-				wishwall.setBackground(Colors.LEFT_CONTENT_BACKGROUND.getColor());
-			}
-		});
+		wishwall.addMouseListener(new ViewDemandGoods<JButton>(wishwall));
 		wishwall.setBorder(null);
 		wishwall.setFont(Fonts.LEFT_CONTENT_OPTION.getFont());
 		wishwall.setBackground(Colors.LEFT_CONTENT_BACKGROUND.getColor());
@@ -818,6 +793,7 @@ public final class Index {
 	 */
 	public void setReadMessage(boolean readMessage) {
 		this.readMessage = readMessage;
+		updateMessages(true);
 	}
 
 	/**

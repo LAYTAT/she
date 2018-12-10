@@ -16,8 +16,62 @@ public final class IdleGoodsDao extends AbstractDao {
 		
 	}
 	
+	public IdleGoods[] getIdleGoodsByHotDegree() {
+		return getIdleGoodsBySQL("SELECT*FROM idlegoods WHERE idleGoodsNo in "
+				+ " (SELECT b.idleGoodsNo FROM( "
+				+ " SELECT idleGoodsNo FROM idlelabel "
+				+ " WHERE goodsVarietyNo IN( "
+				+ " SELECT a.goodsVarietyNo FROM( "
+				+ " SELECT goodsVarietyNo FROM goodsvariety ORDER BY degree DESC LIMIT	0, 3) "
+				+ " as a) )as b)AND state='onsale' order by uploadTime DESC");
+	}
+	
+	public IdleGoods[] getIdleGoodsByLatestGoods() {
+		return getIdleGoodsBySQL("SELECT uploadTime FROM idlegoods ORDER BY uploadTime DESC LIMIT 0,50");
+	}
+	
+	public IdleGoods[] getIdleGoodsBySQL(String sql) {
+		Statement state = getStatement();
+		ResultSet result = getResult(state, sql);
+		if(result == null) {//查询出现异常 
+	       closeStatement(state);
+	       return null;
+		}
+		int rows = 0;
+		try {
+			result.last();
+			rows = result.getRow();
+			result.first();
+		  } catch (SQLException e) {
+			  setMessage("结果出错");
+			  closeStatement(state);
+			  return null;
+		  }
+		  IdleGoods goods[] = new IdleGoods[rows];
+		  try {
+			  for(int i = 0; i < rows; i++) {
+				  goods[i] = new IdleGoods(result.getString(1), result.getString(2));
+				  goods[i].setIdleGoodsName(result.getString(3));
+				  goods[i].setSalePrice(result.getFloat(4));
+				  goods[i].setOriginalPrice(result.getFloat(5));
+				  goods[i].setDegree(result.getInt(6));
+				  goods[i].setUploadTime(result.getString(7));
+				  goods[i].setNote(result.getString(8));
+				  goods[i].switchIdleGoodsStateToEnum(result.getString(9));
+				  if(!result.next())
+					  break;
+			  }
+		  } catch (SQLException e) {
+			  setMessage("数据中断传输");
+			  return null;
+		  } finally {
+			  closeStatement(state);
+		  }
+		  return goods;
+	}
+	
 	  public IdleGoods[] getIdleGoodsBySearch(String keyWord) {
-		  String sql = "select a.idleGoodsNo,a.memberNo,a.idleGoodsName,a.salePrice,a.originalPrice,a.degree,a.uploadTime,a.note,a.state" +
+		  String sql = "select distinct a.idleGoodsNo,a.memberNo,a.idleGoodsName,a.salePrice,a.originalPrice,a.degree,a.uploadTime,a.note,a.state" +
 				  " from idlegoods a join idlelabel b on a.idleGoodsNo = b.idleGoodsNo"+
 				  " join goodsvariety c on b.goodsvarietyNo = c.goodsvarietyNo" +
 				  " where a.idleGoodsName like '%" + keyWord + "%'" +
@@ -72,7 +126,7 @@ public final class IdleGoodsDao extends AbstractDao {
 		  }
 		  int rows = 0;
 		  try {
-			  result.next();
+			  result.last();
 			  rows = result.getRow();
 			  result.first();
 		  } catch (SQLException e) {
@@ -81,11 +135,10 @@ public final class IdleGoodsDao extends AbstractDao {
 			  return null;
 		  }
 		  Picture[] picture = new Picture[rows];
-		  ImageTool tool = null;
 		  try {
 			  for (int i = 0; i < rows; i++) {
 				  picture[i] = new Picture("", result.getString(1));
-				  tool = new ImageTool(Index.getFileName() + ".jpg");
+				  ImageTool tool = new ImageTool(Index.getFileName() + ".jpg");
 				  tool.setImagePath(tool.getAbsolutePath());//设置为绝对路径
 				  tool.saveImage(result.getBinaryStream(2));
 				  picture[i].setPhoto(tool.getImagePath());
@@ -214,6 +267,24 @@ public final class IdleGoodsDao extends AbstractDao {
 	//public boolean updateIdleGoods(IdleGoods goods) {
 		
 	//}
+	public String getMemberNoByIdleGoods(String idleGoodsNo) {
+		String sql = "select memberNo from IdleGoods where idleGoodsNo = '" + idleGoodsNo + "'";
+		Statement state = getStatement();
+		ResultSet result = getResult(state, sql);
+		if(result == null) {//查询出现异常 
+			closeStatement(state);
+			return null;
+		}
+		try {
+			result.next();
+			return result.getString(1);
+		} catch (SQLException e) {
+			setMessage("查询结果出错");//可能提前关闭了发送对象
+		} finally {
+			closeStatement(state);
+		}
+		return null;
+	}
 	
 	/**@deprecated*/
 	public boolean deleteIdleGoods(String idleGoodsNo) {

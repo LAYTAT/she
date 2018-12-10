@@ -45,9 +45,9 @@ public final class ViewMineElseInfo <K extends JComponent> extends MouseAdapter 
 			panel.setLayout(new GridLayout(goods.length, 0, 0, 20));
 		for(int i = 0; i < goods.length; i++) {
 			GoodsVariety[] variety = goodsDao.getGoodsVarietyByGoods(goods[i].getIdleGoodsNo());
-			GoodsList list = new GoodsList();
+			GoodsList list = new GoodsList(goods[i].getIdleGoodsNo());
 			panel.add(list);
-			list.displayIdleList(goods[i], variety, true);
+			list.displayIdleList(goods[i], variety);
 		}
 		panel.repaint();
 	}
@@ -67,7 +67,7 @@ public final class ViewMineElseInfo <K extends JComponent> extends MouseAdapter 
 			panel.setLayout(new GridLayout(goods.length, 0, 0, 20));
 		for(int i = 0; i < goods.length; i++) {
 			GoodsVariety[] variety = goodsDao.getGoodsVarietyByGoods(goods[i].getDemandGoodsNo());
-			GoodsList list = new GoodsList();
+			GoodsList list = new GoodsList(goods[i].getDemandGoodsNo());
 			panel.add(list);
 			list.displayMineDemandList(goods[i], variety);
 		}

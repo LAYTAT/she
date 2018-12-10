@@ -18,16 +18,18 @@ import javax.swing.border.MatteBorder;
 
 import com.wis.pack.component.Photo;
 
+import team.ecust.she.common.ImageTool;
+
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-
+import java.io.File;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
 import javax.swing.JComboBox;
 import javax.swing.JFileChooser;
 
 import javax.swing.JEditorPane;
-
+import team.ecust.she.controller.UploadIdleGoodsController;;
 
 @SuppressWarnings("serial")
 public final class UploadIdleGoods extends JPanel {
@@ -48,7 +50,22 @@ public final class UploadIdleGoods extends JPanel {
 	private JFileChooser chosePhoto3;
 	private JFileChooser chosePhoto4;
 	
-
+	//四张图片对应四个文件
+	private File photoFile1;
+	private File photoFile2;
+	private File photoFile3;
+	private File photoFile4;
+	
+	//四张图片是否被选	
+	private boolean isPhoto1Chosed=false;
+	private boolean isPhoto2Chosed=false;
+	private boolean isPhoto3Chosed=false;
+	private boolean isPhoto4Chosed=false;
+	
+	//两个标签
+	private JTextField goodsLabelTextField1;
+	private JTextField goodsLabelTextField2;
+	
 
 	/**
 	 * @return  String 闲置物品名称
@@ -103,11 +120,19 @@ public final class UploadIdleGoods extends JPanel {
 	public String getIdleGoodsNote() {
 		return note.getText().toString();
 	}
-	
-	
+	/**
+	 * @return String 闲置物品的标签1*/
+	public String getGoodsLabel1(){
+		return goodsLabelTextField1.getText().toString();
+	}
+	/**
+	 * @return String 闲置物品的标签1*/
+	public String getGoodsLabel2(){
+		return goodsLabelTextField2.getText().toString();
+	}
 	
 	/**@return 闲置物品种类 **/
-	public String getVarietySelectedIndex(){
+	public String getVarietySelectedIndexString(){
 		switch(varietyComboBox.getSelectedIndex()){
 				case 0: return "书籍类";
 				case 1: return "电子产品";
@@ -115,11 +140,32 @@ public final class UploadIdleGoods extends JPanel {
 				case 3: return "食品";
 				case 4: return "纪念品";
 				case 5: return "其他";
-				default: return null;
-		}
-	
-		
+				default: return null;		}
+}
+	/**
+	 * @return boolean 图片一是否被选*/
+	public boolean isPhoto1Chosed() {
+		return isPhoto1Chosed;
+}
+	/**
+	 * @return boolean 图片2是否被选*/
+	public boolean isPhoto2Chosed() {
+		return isPhoto2Chosed;
+}
+	/**
+	 * @return boolean 图片3是否被选*/
+	public boolean isPhoto3Chosed() {
+		return isPhoto3Chosed;
 	}
+
+	/**
+	 * @return boolean 图片4是否被选*/
+	public boolean isPhoto4Chosed() {
+		return isPhoto4Chosed;
+	}
+
+
+	
 	/**
 	 * 
 	 * Create the panel.
@@ -131,10 +177,10 @@ public final class UploadIdleGoods extends JPanel {
 
 	public void display()
 	{
-		int width =1980;
-		int height =1000;
-	    //int width = getWidth();
-       // int height =getHeight();			
+		//int width =1980;
+		//int height =1000;
+	    int width = getWidth();
+        int height =getHeight();			
 		int subPanelWidth = 1200;
 		int subPanelHeight =850;  
 		
@@ -263,6 +309,46 @@ public final class UploadIdleGoods extends JPanel {
 	    goodsNameTextField.setColumns(10);
 	    goodsNamePanel.add(goodsNameTextField);
 	    
+	    JPanel goodsLabelMainPanel = new JPanel();
+	    mainPanel.add(goodsLabelMainPanel);
+	    goodsLabelMainPanel.setLayout(new GridLayout(0, 2, 0, 4));
+	    
+	    JPanel goodsLabelSubPanel1 = new JPanel();
+	    goodsLabelMainPanel.add(goodsLabelSubPanel1);
+	    goodsLabelSubPanel1.setLayout(new GridLayout(0, 1, 0, 0));
+	    
+	    JLabel labelLabel = new JLabel(" 物品标签");
+	    labelLabel.setFont(new Font("微软雅黑", Font.BOLD, 20));
+	    goodsLabelSubPanel1.add(labelLabel);
+	    
+	    JPanel goodsLabelSubPanel2 = new JPanel();
+	    goodsLabelMainPanel.add(goodsLabelSubPanel2);
+	    goodsLabelSubPanel2.setLayout(new GridLayout(0, 2, 4, 10));
+	    
+	    goodsLabelTextField1 = new JTextField();
+	    goodsLabelTextField1.addFocusListener(new FocusAdapter() {
+	    	@Override
+	    	public void focusGained(FocusEvent e) {
+	    		goodsLabelTextField1.selectAll();
+	    	}
+	    });
+	    goodsLabelTextField1.setText("标签1");
+	    goodsLabelTextField1.setFont(new Font("微软雅黑", Font.PLAIN, 25));
+	    goodsLabelSubPanel2.add(goodsLabelTextField1);
+	    goodsLabelTextField1.setColumns(10);
+	    
+	    goodsLabelTextField2 = new JTextField();
+	    goodsLabelTextField2.setText("标签2");
+	    goodsLabelTextField2.addFocusListener(new FocusAdapter() {
+	    	@Override
+	    	public void focusGained(FocusEvent e) {
+	    		goodsLabelTextField2.selectAll();
+	    	}
+	    });
+	    goodsLabelTextField2.setFont(new Font("微软雅黑", Font.PLAIN, 25));
+	    goodsLabelSubPanel2.add(goodsLabelTextField2);
+	    goodsLabelTextField2.setColumns(10);
+	    
 	    JPanel filePanel1 = new JPanel();
 	    panel.add(filePanel1);
 	    filePanel1.setLayout(null);
@@ -293,17 +379,43 @@ public final class UploadIdleGoods extends JPanel {
 	    photoButton2.addMouseListener(new MouseAdapter() {
 	    	
 	    	public void mouseClicked(MouseEvent e) {
-	    	    chosePhoto2 =new JFileChooser();
+	    		PhotoPanel2.removeAll();
+	    		
+	    		chosePhoto2= new JFileChooser();
 	    		chosePhoto2.showOpenDialog(chosePhoto2);
-	    		Photo photo2 =new Photo(chosePhoto2.getSelectedFile().getAbsolutePath());
+	    		File file = chosePhoto2.getSelectedFile();
+	    		if(file == null || !file.exists() || !file.isFile())
+	    			return;
+	    		Photo photo2=new Photo(file.getAbsolutePath());
 	    		photo2.setScaleFunction(true);
 	    		photo2.setDragFunction(true);
 	    		photo2.setRecoverFunction(true);
 	    		PhotoPanel2.add(photo2);
-	    		photoButton2.setText("点击重新选择");
-	    		PhotoPanel2.validate();
 	    		
-	    	}
+				photoFile2 = chosePhoto2.getSelectedFile();
+				if(photoFile2 == null || !photoFile2.exists() || photoFile2.isDirectory()) {
+					(new PromptBox()).open("未选择图片");
+					return;
+				}
+				
+				String temp = photoFile2.getAbsolutePath();
+				if(!temp.endsWith(".png") && !temp.endsWith(".jpg") && !temp.endsWith(".gif")
+						&& !temp.endsWith(".PNG") && !temp.endsWith(".JPG") && !temp.endsWith(".GIF")) {
+					(new PromptBox()).open("不支持此图片格式");
+					return;
+				}
+				
+				ImageTool tool = new ImageTool();
+				tool.setImagePath(temp);
+				if(tool.exceedSize(1000000))
+					(new PromptBox()).open("图片过大");
+				else {
+					photo2.setPhoto(tool.getImage());
+					photoButton2.setText("点击重新选择");
+					isPhoto2Chosed=true;
+					PhotoPanel2.validate();
+	    		
+	    	}}
 	    });
 	    photoButton2.setFont(Fonts.PLAIN_PROMPT_TEXT.getFont());;
         photoButton2.setBounds(352, 381, 211, 43);
@@ -317,16 +429,42 @@ public final class UploadIdleGoods extends JPanel {
 	    photoButton1.addMouseListener(new MouseAdapter() {
 	    	@Override
 	    	public void mouseClicked(MouseEvent e) {
-	    	    chosePhoto1 =new JFileChooser();
+	    		photoPanel1.removeAll();
+	    		
+	    		chosePhoto1= new JFileChooser();
 	    		chosePhoto1.showOpenDialog(chosePhoto1);
-	    		Photo photo1 =new Photo(chosePhoto1.getSelectedFile().getAbsolutePath());
+	    		File file = chosePhoto1.getSelectedFile();
+	    		if(file == null || !file.exists() || !file.isFile())
+	    			return;
+	    		Photo photo1 =new Photo(file.getAbsolutePath());
 	    		photo1.setScaleFunction(true);
 	    		photo1.setDragFunction(true);
 	    		photo1.setRecoverFunction(true);
 	    		photoPanel1.add(photo1);
-	    		photoButton1.setText("点击重新选择");
-	    		photoPanel1.validate();
-	    	}
+	    		
+				photoFile1 = chosePhoto1.getSelectedFile();
+				if(photoFile1 == null || !photoFile1.exists() || photoFile1.isDirectory()) {
+					(new PromptBox()).open("未选择图片");
+					return;
+				}
+				
+				String temp = photoFile1.getAbsolutePath();
+				if(!temp.endsWith(".png") && !temp.endsWith(".jpg") && !temp.endsWith(".gif")
+						&& !temp.endsWith(".PNG") && !temp.endsWith(".JPG") && !temp.endsWith(".GIF")) {
+					(new PromptBox()).open("不支持此图片格式");
+					return;
+				}
+				
+				ImageTool tool = new ImageTool();
+				tool.setImagePath(temp);
+				if(tool.exceedSize(1000000))
+					(new PromptBox()).open("图片过大");
+				else {
+					photo1.setPhoto(tool.getImage());
+					photoButton1.setText("点击重新选择");
+					isPhoto1Chosed=true;
+					photoPanel1.validate();
+	    	}}
 	    });
 	    photoButton1.setFont(Fonts.PLAIN_PROMPT_TEXT.getFont());
     
@@ -357,39 +495,12 @@ public final class UploadIdleGoods extends JPanel {
 	    note.setBorder(new MatteBorder(1, 1, 1, 1, (Color) new Color(0, 120, 215)));
 	    notePanel.add(note);
 	    note.setFont(Fonts.PLAIN_PROMPT_TEXT.getFont());
-	    note.setText("让大家更了解你的闲置物品(300字内)\r\n");
+	    note.setText("让大家更了解你的闲置物品(255字内)\r\n");
 	    note.setPreferredSize(new Dimension(300, 300));
-	    
 	    JButton confirmUploadButton = new JButton("确认上传");
+	    confirmUploadButton.addMouseListener(new UploadIdleGoodsController<UploadIdleGoods>(this));//UploadIdleGoodsController
 	    confirmUploadButton.setForeground(Color.WHITE);
 	    confirmUploadButton.setBackground(Color.PINK);
-	    /**判断是否填写了内容*/
-	    confirmUploadButton.addMouseListener(new MouseAdapter() {
-	    	@Override
-	    	public void mouseClicked(MouseEvent e) {
-	    		if(priceTextField.getText().length() == 0 || priceTextField.getText().equals("xxx(人民币)") )
-	    		{
-	    			new PromptBox().open("请输入预期价格!");
-	    			
-	    		}
-	    		else if(originalPriceTextField.getText().length() == 0 || originalPriceTextField.getText().equals("xxx(人民币)") )
-	    		{
-	    			new PromptBox().open("请输入原价!");
-	    		}
-	    		else if(goodsNameTextField.getText().length() == 0 || goodsNameTextField.getText().equals("方便大家搜索到你的闲置") )
-	    		{
-	    			new PromptBox().open("请输入名称!");
-	    		}
-	    		else if(degreeTextField.getText().length() == 0 || degreeTextField.getText().equals("填写数字:1-9")|| degreeTextField.getText().length() >1|| !degreeTextField.getText().toString().matches("[0-9]"))
-	    		{
-	    			new PromptBox().open("请输入正确的新旧程度!");
-	    		}
-	    		else if(note.getText().length()==0|| note.getText().length()>=300|| note.getText().equals("让大家更了解你的闲置物品(300字内)\r\n")){
-	    			new PromptBox().open("请输入正确的备注!");
-	    		}
-	    			
-	    	}
-	    });
 	    confirmUploadButton.setFont(Fonts.BOLD_PROMPT_TEXT.getFont());
 	    confirmUploadButton.setBounds(94, 342, 506, 43);
 	    notePanel.add(confirmUploadButton);
@@ -410,16 +521,52 @@ public final class UploadIdleGoods extends JPanel {
 	    photoButton3.addMouseListener(new MouseAdapter() {
 	    	
 	    	public void mouseClicked(MouseEvent e) {
-	    	    chosePhoto3 =new JFileChooser();
+//	    	    chosePhoto3 =new JFileChooser();
+//	    		chosePhoto3.showOpenDialog(chosePhoto3);
+//	    		Photo photo3 =new Photo(chosePhoto3.getSelectedFile().getAbsolutePath());
+//	    		photo3.setScaleFunction(true);
+//	    		photo3.setDragFunction(true);
+//	    		photo3.setRecoverFunction(true);
+//	    		photoPanel3.add(photo3);
+//	    		photoButton3.setText("点击重新选择");
+//	    		photoPanel3.validate();
+	    	//	photoPanel3.validate();
+	    		photoPanel3.removeAll();
+	    		
+	    		chosePhoto3 = new JFileChooser();
 	    		chosePhoto3.showOpenDialog(chosePhoto3);
-	    		Photo photo3 =new Photo(chosePhoto3.getSelectedFile().getAbsolutePath());
+	    		File file = chosePhoto3.getSelectedFile();
+	    		if(file == null || !file.exists() || !file.isFile())
+	    			return;
+	    		Photo photo3 =new Photo(file.getAbsolutePath());
 	    		photo3.setScaleFunction(true);
 	    		photo3.setDragFunction(true);
 	    		photo3.setRecoverFunction(true);
 	    		photoPanel3.add(photo3);
-	    		photoButton3.setText("点击重新选择");
-	    		photoPanel3.validate();
 	    		
+				photoFile3 = chosePhoto3.getSelectedFile();
+				if(photoFile3 == null || !photoFile3.exists() || photoFile3.isDirectory()) {
+					(new PromptBox()).open("未选择图片");
+					return;
+				}
+				
+				String temp = photoFile3.getAbsolutePath();
+				if(!temp.endsWith(".png") && !temp.endsWith(".jpg") && !temp.endsWith(".gif")
+						&& !temp.endsWith(".PNG") && !temp.endsWith(".JPG") && !temp.endsWith(".GIF")) {
+					(new PromptBox()).open("不支持此图片格式");
+					return;
+				}
+				
+				ImageTool tool = new ImageTool();
+				tool.setImagePath(temp);
+				if(tool.exceedSize(1000000))
+					(new PromptBox()).open("图片过大");
+				else {
+					photo3.setPhoto(tool.getImage());
+					photoButton3.setText("点击重新选择");
+					photoPanel3.validate();
+					isPhoto3Chosed = true;
+				}
 	    	}
 	    });
 	   photoButton3.setFont(Fonts.PLAIN_PROMPT_TEXT.getFont());;
@@ -439,15 +586,43 @@ public final class UploadIdleGoods extends JPanel {
 	    photoButton4.addMouseListener(new MouseAdapter() {
 	    	
 	    	public void mouseClicked(MouseEvent e) {
-	    	    chosePhoto4 =new JFileChooser();
+	    		photoPanel4.removeAll();
+	    		
+	    		chosePhoto4= new JFileChooser();
 	    		chosePhoto4.showOpenDialog(chosePhoto4);
-	    		Photo photo4 =new Photo(chosePhoto4.getSelectedFile().getAbsolutePath());
+	    		File file = chosePhoto4.getSelectedFile();
+	    		if(file == null || !file.exists() || !file.isFile())
+	    			return;
+	    		Photo photo4=new Photo(file.getAbsolutePath());
 	    		photo4.setScaleFunction(true);
 	    		photo4.setDragFunction(true);
 	    		photo4.setRecoverFunction(true);
 	    		photoPanel4.add(photo4);
-	    		photoButton4.setText("点击重新选择");
-	    		photoPanel4.validate();
+	    		
+				photoFile4 = chosePhoto4.getSelectedFile();
+				if(photoFile4 == null || !photoFile4.exists() || photoFile4.isDirectory()) {
+					(new PromptBox()).open("未选择图片");
+					return;
+				}
+				
+				String temp = photoFile4.getAbsolutePath();
+				if(!temp.endsWith(".png") && !temp.endsWith(".jpg") && !temp.endsWith(".gif")
+						&& !temp.endsWith(".PNG") && !temp.endsWith(".JPG") && !temp.endsWith(".GIF")) {
+					(new PromptBox()).open("不支持此图片格式");
+					return;
+				}
+				
+				ImageTool tool = new ImageTool();
+				tool.setImagePath(temp);
+				if(tool.exceedSize(1000000))
+					(new PromptBox()).open("图片过大");
+				else {
+					photo4.setPhoto(tool.getImage());
+					photoButton4.setText("点击重新选择");
+					photoPanel4.validate();
+					isPhoto4Chosed=true;
+	    		
+				}
 	    	}
 	    });
 	    photoButton4.setFont(Fonts.PLAIN_PROMPT_TEXT.getFont());;

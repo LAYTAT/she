@@ -13,6 +13,46 @@ public final class DemandGoodsDao extends AbstractDao {
 		
 	}
 	
+	public DemandGoods[] getAllDemandGoods() {
+		String sql = "select demandGoodsNo,demandGoodsName,price,degree,uploadTime,note,state from DemandGoods order by uploadTime DESC";
+		  Statement state = getStatement();
+		  ResultSet result = getResult(state, sql);
+		  if(result == null) {//查询出现异常 
+		       closeStatement(state);
+		       return null;
+		  }
+		  int rows = 0;
+		  try {
+			  result.last();
+			  rows = result.getRow();
+			  result.first();
+		  } catch (SQLException e) {
+			  setMessage("结果出错");
+			  closeStatement(state);
+			  return null;
+		  }
+		  DemandGoods goods[] = new DemandGoods[rows];
+		  try {
+			  for(int i = 0; i < rows; i++) {
+				  goods[i] = new DemandGoods(result.getString(1));
+				  goods[i].setDemandGoodsName(result.getString(2));
+				  goods[i].setPrice(result.getFloat(3));
+				  goods[i].setDegree(result.getInt(4));
+				  goods[i].setUploadTime(result.getString(5));
+				  goods[i].setNote(result.getString(6));
+				  goods[i].switchDemandGoodsStateToEnum(result.getString(7));
+				  if(!result.next())
+					  break;
+			  }
+		  } catch (SQLException e) {
+			  setMessage("数据中断传输");
+			  return null;
+		  } finally {
+			  closeStatement(state);
+		  }
+		  return goods;
+	}
+	
 	public DemandGoods[] getDemandGoodsByMember(String memberNo) {
 		String sql = "select demandGoodsNo,demandGoodsName,price,degree,uploadTime,note,state from DemandGoods where memberNo = '" + memberNo + "'";
 		  Statement state = getStatement();

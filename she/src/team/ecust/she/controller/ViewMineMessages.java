@@ -26,7 +26,7 @@ public final class ViewMineMessages <K extends JComponent> extends MouseAdapter 
 			login.display();
 			return;
 		}
-		Messages messages = new Messages();
+		Messages messages = new Messages(true);
 		index.showInCard(messages);
 		messages.display();
 	}
