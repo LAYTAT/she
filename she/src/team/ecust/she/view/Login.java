@@ -68,7 +68,9 @@ public final class Login extends JPanel {
 	public void setConfirmButtonEnabled(boolean enable) {
 		loginConfirmButton.setEnabled(enable);
 	}
-	
+	public boolean isEnabledOfConfirmButton() {
+		return loginConfirmButton.isEnabled();
+	}
 	
 	public Login() {
 		//display();

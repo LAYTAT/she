@@ -5,8 +5,10 @@ import java.awt.event.MouseEvent;
 import java.text.SimpleDateFormat;
 
 import team.ecust.she.common.FileTool;
+import team.ecust.she.common.ImageTool;
 import team.ecust.she.dao.IdleGoodsDao;
 import team.ecust.she.dao.MemberDao;
+import team.ecust.she.model.IdleGoods.IdlegoodsState;
 import team.ecust.she.view.Index;
 import team.ecust.she.view.Messages;
 import team.ecust.she.view.PromptBox;
@@ -27,7 +29,12 @@ public final class ContactSeller extends MouseAdapter {
 		IdleGoodsDao dao = new IdleGoodsDao();
 		String objectNo = dao.getMemberNoByIdleGoods(goodsNo);
 		if(index.getMemberNo().equals(objectNo)) {
-			(new PromptBox()).open("这是你啊");
+			(new PromptBox()).open("这是你的啊");
+			return;
+		}
+		
+		if(dao.getIdleGoodsByIdleGoods(goodsNo).getState() != IdlegoodsState.ON_SALE) {
+			(new PromptBox()).open("物品已售出或失效");
 			return;
 		}
 		
@@ -36,15 +43,18 @@ public final class ContactSeller extends MouseAdapter {
 		
 		FileTool tool = new FileTool(index.getMemberNo());
 		tool.createFolderIfNotExist();
-		tool.setFilePath("src/team/ecust/she/file/" + index.getMemberNo() + "/" + objectNo);
+		ImageTool tools = new ImageTool();
+		tools.setImagePath(tool.getFilePath() + "/" + objectNo);
+		tool.setFilePath(tools.getAbsolutePath());
+		
 		SimpleDateFormat sp1 = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 		String time = sp1.format(new java.util.Date());
 		tool.append("\n[" + time + " 系统]");
 		
 		messages.display();
-		messages.getChatRecord().display(objectNo);
 		messages.setObjectNo(objectNo);
 		messages.setObjectNickName((new MemberDao()).getMemberToEdit(objectNo).getNickname());
+		messages.getChatRecord().display(objectNo);
 	}
 	
 	@Override

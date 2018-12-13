@@ -41,8 +41,9 @@ public final class MineInfo extends JPanel {
 	}
 
 	/**初始化，设置卡片为空对象。 */
-	public MineInfo() {
+	public MineInfo(String memberNo) {
 		card = null;
+		setMemberNo(memberNo);
 		//display(null);
 	}
 	
@@ -52,7 +53,6 @@ public final class MineInfo extends JPanel {
 	 * @param member 需要显示信息的会员对象，可以为空，但啥信息也不显示，之后调用其他方法也不显示。
 	 */
 	public void display(Member member) {
-		setMemberNo(member.getMemberNo());
 		int width = getWidth();
 		int height = getHeight();
 		setLayout(new BorderLayout(0, 20));//使用边界布局
@@ -151,14 +151,14 @@ public final class MineInfo extends JPanel {
 		mineDemand.setHorizontalAlignment(SwingConstants.CENTER);
 		options.add(mineDemand);
 		
-		JLabel mineOrder = new JLabel("我的交易");
+		JLabel mineOrder = new JLabel("交易记录");
 		mineOrder.addMouseListener(new ViewMineElseInfo<JLabel>(mineOrder, this, 3));
 		mineOrder.setOpaque(true);//打开背景色
 		mineOrder.setFont(Fonts.MINE_INFO_OPTIONS.getFont());
 		mineOrder.setHorizontalAlignment(SwingConstants.CENTER);
 		options.add(mineOrder);
 		
-		JLabel relativeComment = new JLabel("相关评价");
+		JLabel relativeComment = new JLabel("心满意足");
 		relativeComment.addMouseListener(new ViewMineElseInfo<JLabel>(relativeComment, this, 4));
 		relativeComment.setOpaque(true);//打开背景色
 		relativeComment.setFont(Fonts.MINE_INFO_OPTIONS.getFont());

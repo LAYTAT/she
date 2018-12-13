@@ -115,7 +115,8 @@ public class IdleGoodsInfo extends JPanel {
 		above.add(right);
 		
 		JPanel below = new JPanel(new GridLayout(0, 4, 10, 0));
-		below.setBorder(new EmptyBorder(10, 0, 0, 0));
+		below.setBackground(new Color(50, 50, 50));
+		below.setBorder(new EmptyBorder(10, 10, 10, 10));
 		add(below);
 		
 		for(int i = 0; i < picture.length; i++) {

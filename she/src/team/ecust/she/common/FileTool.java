@@ -283,12 +283,16 @@ public final class FileTool {
 			System.err.println("->该文件路径为null");
 			return false;
 		}
+		if(!file.exists())
+			try {
+				file.createNewFile();
+			} catch (IOException e) {
+				System.err.println("->该路径创建文件失败：" + filepath);
+				return false;
+			}
 		FileOutputStream write = null;
 		try {
-			if(file.exists())
-				write = new FileOutputStream(file, true);
-			else
-				write = new FileOutputStream(file);
+			write = new FileOutputStream(file, true);
 			write.write(data.getBytes());
 			return true;
 		} catch (FileNotFoundException e1) {

@@ -116,7 +116,7 @@ public final class IdleGoods {
 		if(state ==null)
 			return null;
 		switch(state){
-		case ON_SALE: return "on sale";
+		case ON_SALE: return "onsale";
 		case WORKOFF: return "workoff";
 		case CANCEL: return "cancel";
 		default: return null;

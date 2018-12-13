@@ -109,6 +109,16 @@ public String switchCommentStateToString(){
 	}
 }
 
+public String switchCommentStateToChinese(){
+	if(state ==null)
+		return null;
+	switch (state){
+	case NORMAL: return "正常";
+	case TIPOFF: return "被举报";
+	default: return null;
+	}
+}
+
 /**根据评论状态字符串改变对象的状态枚举属性.
  * @param state 需要转换的状态字符串, 为空对象或者不合法则不改变对象的属性了
  */
@@ -116,8 +126,9 @@ public void switchStringToCommentStataEnum(String state){
 	if (state == null)
 		return;
 	 switch(state){
-	 case "normal": this.state=CommentState.NORMAL;
-	 case "tipoff": this.state= CommentState.TIPOFF;
+	 case "normal": this.state=CommentState.NORMAL;break;
+	 case "tipoff": this.state= CommentState.TIPOFF;break;
+	 default :break;
 	 }
 }
 

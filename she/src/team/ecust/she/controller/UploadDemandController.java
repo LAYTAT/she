@@ -41,11 +41,11 @@ public class UploadDemandController <K extends JComponent> extends MouseAdapter{
 		String label3=uploadDemandGoods.getVarietySelectedIndex();
 		String note=uploadDemandGoods.getDemandGoodsNote();
 		//上传时间:
-		SimpleDateFormat sp1=new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
+		SimpleDateFormat sp1=new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 				//SimpleDateFormat("yyyy-MM-dd hh"+"'"+"mm""ss");
 		String uploadDemandTime=sp1.format(new java.util.Date());
 		
-		if(highestPrice.length() == 0 ||highestPrice.equals("xxx(人民币)")||!highestPrice.matches("^(([1-9]{1}\\d*)|([0]{1}))(\\.(\\d){0,2})?$")) {
+		if(highestPrice.length() == 0 ||highestPrice.equals("xxx(人民币)")||!highestPrice.matches("^([1-9][0-9]{0,4})|([1-9][0-9]{0,4}.[0-9]{1,2})")) {
     		
 			new PromptBox().open("请输入预期最高价格!(小数位最多两位)");
 			return;
@@ -67,7 +67,10 @@ public class UploadDemandController <K extends JComponent> extends MouseAdapter{
 		else if(note.length()==0|| note.length()>=255|| note.equals("让大家更了解你的需求物品的要求(255字内)\r\n")){
 			new PromptBox().open("请输入正确的备注!");
 			return;
-		}
+		}else if (label1.matches(".*\'.*")|| label2.matches(".*\'.*") || goodsName.matches(".*\'.*")|| note.matches(".*\'.*")){
+			new PromptBox().open("不要输入单引号!");
+			return;
+				}
 		else{
 				DemandGoodsDao demandGoodsDao=new DemandGoodsDao();
 				DemandGoodsLabelDao demandGoodsLabelDao=new DemandGoodsLabelDao();

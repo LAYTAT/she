@@ -47,7 +47,7 @@ public final class ClassifySearch <K extends JComponent> extends MouseAdapter {
 			GoodsVariety[] variety = dao.getGoodsVarietyByGoods(goods[i].getIdleGoodsNo());
 			GoodsList list = new GoodsList(goods[i].getIdleGoodsNo());
 			panel.add(list);
-			list.displayIdleList(goods[i], variety);
+			list.displayIdleList(goods[i], variety, true);
 		}
 		panel.repaint();
 	}

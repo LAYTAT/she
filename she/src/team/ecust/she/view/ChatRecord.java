@@ -20,9 +20,27 @@ public class ChatRecord extends JPanel {
 	private final static Font CHAT_FONT = new Font("宋体", Font.PLAIN, 24);
 	
 	private Vector<RowWord> vector;
+	private String objectNo;
 	
-	public void addRecord(String word) {
-		
+	public String getObjectNo() {
+		return objectNo;
+	}
+
+	public void setObjectNo(String objectNo) {
+		this.objectNo = objectNo;
+	}
+
+	public synchronized void addRecord(String data, boolean time) {
+		RowWord word = new RowWord(data);
+		if(time) {
+			word.color = TIME_TITLE;
+			word.font = TIME_FONT;
+		} else {
+			word.color = CHAT_TEXT;
+			word.font = CHAT_FONT;
+		}
+		word.y = vector.lastElement().y + 30;
+		vector.add(word);
 		repaint();
 	}
 	
@@ -44,6 +62,7 @@ public class ChatRecord extends JPanel {
 	
 	public ChatRecord() {
 		setBackground(Colors.CENTER_CARD_BACKGROUND.getColor());
+		objectNo = "";
 	}
 	
 	@Override
@@ -67,10 +86,7 @@ public class ChatRecord extends JPanel {
 		if(vector != null)
 			vector.clear();
 		
-		int width = getWidth();
-		int height = getHeight();
-		if(width == 0 || height == 0)//未加入容器中或者显示了也没作用
-			return;
+		this.setObjectNo(objectNo);
 		vector = new Vector<RowWord>();//以10个为单位分配
 		String text = null;
 		FileTool file = new FileTool(Index.getInstance().getMemberNo() + "/" + objectNo);//新建软件信息文件对象
@@ -97,14 +113,14 @@ public class ChatRecord extends JPanel {
 		
 		if(vector.size() != 0 && vector.lastElement().y > getHeight() - 30)//微调
 			adjust(getHeight() - vector.lastElement().y - 30);
-			
+		
 		addMouseWheelListener(new MouseWheelListener() {
 			@Override
 			public void mouseWheelMoved(MouseWheelEvent e) {
 				if(e.getWheelRotation() == MouseWheelEvent.WHEEL_BLOCK_SCROLL) 
-					adjust(15);
-				else if(e.getWheelRotation() == -MouseWheelEvent.WHEEL_BLOCK_SCROLL)
 					adjust(-15);
+				else if(e.getWheelRotation() == -MouseWheelEvent.WHEEL_BLOCK_SCROLL)
+					adjust(15);
 				repaint();
 			}
 		});

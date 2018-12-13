@@ -1,7 +1,6 @@
 package team.ecust.she.view;
 
 import java.awt.Color;
-import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.GridLayout;
@@ -12,11 +11,12 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.SwingConstants;
 
-import team.ecust.she.dao.IdleGoodsDao;
+import team.ecust.she.controller.ViewIdleGoodsInfo;
+import team.ecust.she.dao.DemandGoodsDao;
 import team.ecust.she.model.DemandGoods;
+import team.ecust.she.model.DemandGoods.DemandGoodsState;
 import team.ecust.she.model.GoodsVariety;
 import team.ecust.she.model.IdleGoods;
-import team.ecust.she.model.Picture;
 
 import javax.swing.border.EmptyBorder;
 import javax.swing.JTextArea;
@@ -41,59 +41,45 @@ public class GoodsList extends JPanel {
 		//displayOthersDemandList(new DemandGoods(""), null);
 	}
 	
-	public void displayIdleList(IdleGoods goods, GoodsVariety[]variety) {
+	public void displayIdleList(IdleGoods goods, GoodsVariety[]variety, boolean view) {
 		setGoodsNo(goods.getIdleGoodsNo());
 		setPreferredSize(new Dimension(1000, 100));
 		setBorder(new LineBorder(Color.blue, 1));
 		setLayout(new GridLayout(3, 3, 0, 0));
 		
 		JLabel name = new JLabel(goods.getIdleGoodsName());
-		name.addMouseListener(new MouseAdapter() {
-			@Override
-			public void mouseEntered(MouseEvent e) {
-				name.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-			}
-			@Override
-			public void mouseExited(MouseEvent e) {
-				name.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
-			}
-			@Override
-			public void mouseClicked(MouseEvent e) {
-				IdleGoodsDao dao = new IdleGoodsDao();
-				IdleGoods goods = dao.getIdleGoodsByIdleGoods(getGoodsNo());
-				GoodsVariety[] label = dao.getGoodsVarietyByGoods(getGoodsNo());
-				Picture[] picture = dao.getPictureByIdleGoods(getGoodsNo());
-				IdleGoodsInfo info = new IdleGoodsInfo(getGoodsNo());
-				Index.getInstance().showInCard(info);
-				info.display(goods, label, picture);
-			}
-		});
+		name.addMouseListener(new ViewIdleGoodsInfo<JLabel>(name, goodsNo, view));
 		name.setFont(new Font("黑体", Font.PLAIN, 22));
 		name.setOpaque(true);
 		name.setForeground(Color.BLUE);
 		add(name);
 		
 		JLabel time = new JLabel("上传时间：" + goods.getUploadTime());
+		time.setHorizontalAlignment(SwingConstants.CENTER);
 		time.setFont(new Font("宋体", Font.PLAIN, 20));
 		time.setOpaque(true);
 		add(time);
 		
 		JLabel state = new JLabel("物品状态：" + goods.switchIdleGoodsStateToChinese());
+		state.setHorizontalAlignment(SwingConstants.CENTER);
 		state.setFont(new Font("宋体", Font.PLAIN, 20));
 		state.setOpaque(true);
 		add(state);
 		
 		JLabel degree = new JLabel("新旧度：" + goods.getDegree() + "成新");
+		degree.setHorizontalAlignment(SwingConstants.CENTER);
 		degree.setFont(new Font("宋体", Font.PLAIN, 20));
 		degree.setOpaque(true);
 		add(degree);
 		
 		JLabel salePrice = new JLabel("售价：" + goods.getSalePrice() + "元");
+		salePrice.setHorizontalAlignment(SwingConstants.CENTER);
 		salePrice.setFont(new Font("宋体", Font.PLAIN, 20));
 		salePrice.setOpaque(true);
 		add(salePrice);
 		
 		JLabel originalPrice = new JLabel("原价：" + goods.getOriginalPrice() + "元");
+		originalPrice.setHorizontalAlignment(SwingConstants.CENTER);
 		originalPrice.setFont(new Font("宋体", Font.PLAIN, 20));
 		originalPrice.setOpaque(true);
 		add(originalPrice);
@@ -133,6 +119,7 @@ public class GoodsList extends JPanel {
 	
 	public void displayMineDemandList(DemandGoods goods, GoodsVariety[]variety) {
 		setGoodsNo(goods.getDemandGoodsNo());
+		
 		setPreferredSize(new Dimension(1000, 200));
 		setBorder(new LineBorder(Color.cyan, 1));
 		setLayout(new GridLayout(2, 0, 0, 1));
@@ -152,18 +139,22 @@ public class GoodsList extends JPanel {
 		first.add(operate);
 		
 		JButton delete = new JButton("删除");
-		delete.setBackground(new Color(255, 69, 0));
+		delete.setBackground(new Color(200, 100, 50));
 		delete.setFont(new Font("黑体", Font.PLAIN, 20));
 		operate.add(delete);
 		
 		JButton cancel = new JButton("取消");
 		cancel.setFont(new Font("黑体", Font.PLAIN, 20));
-		cancel.setBackground(new Color(128, 128, 128));
+		cancel.setBackground(new Color(120, 180, 180));
 		operate.add(cancel);
 		
 		JButton done = new JButton("完成");
 		done.setFont(new Font("黑体", Font.PLAIN, 20));
-		done.setBackground(new Color(0, 255, 0));
+		done.setBackground(new Color(50, 200, 50));
+		if(goods.getState() == DemandGoodsState.CANCEL || goods.getState() == DemandGoodsState.DONE) {
+			cancel.setEnabled(false);
+			done.setEnabled(false);
+		}
 		operate.add(done);
 		
 		JPanel second = new JPanel(new GridLayout(0, 4));
@@ -208,6 +199,55 @@ public class GoodsList extends JPanel {
 		label3.setForeground(Color.green);
 		label3.setOpaque(true);
 		third.add(label3);
+		
+		delete.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				if(!cancel.isEnabled())
+					return;
+				DemandGoodsDao dao = new DemandGoodsDao();
+				if(dao.deleteDemandGoods(goodsNo)) {
+					delete.setEnabled(false);
+					cancel.setEnabled(false);
+					done.setEnabled(false);
+					(new PromptBox()).open("删除成功");
+				} else {
+					(new PromptBox()).open(dao.getMessage());
+				}
+			}
+		});
+		
+		cancel.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				if(!cancel.isEnabled())
+					return;
+				DemandGoodsDao dao = new DemandGoodsDao();
+				if(dao.updateGoodsStateToCancel(goodsNo)) {
+					cancel.setEnabled(false);
+					done.setEnabled(false);
+					state.setText("愿望状态：不再需要");
+					(new PromptBox()).open("已为您取消匹配");
+				} else
+					(new PromptBox()).open(dao.getMessage());
+			}
+		});
+		
+		done.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				if(!cancel.isEnabled())
+					return;
+				DemandGoodsDao dao = new DemandGoodsDao();
+				if(dao.updateGoodsStateToDone(goodsNo)) {
+					cancel.setEnabled(false);
+					done.setEnabled(false);
+					state.setText("愿望状态：成功完成");
+					(new PromptBox()).open("已为您完成愿望");
+				} else
+					(new PromptBox()).open(dao.getMessage());
+			}
+		});
 		
 		for(int i = 0; i < variety.length; i++) {
 			if(variety[i] == null)

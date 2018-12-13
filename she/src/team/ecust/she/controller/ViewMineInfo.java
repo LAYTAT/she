@@ -36,7 +36,7 @@ public final class ViewMineInfo <K extends JComponent> extends MouseAdapter {
 			(new PromptBox(Tips.ERROR)).open(dao.getMessage());
 			return;
 		}
-		MineInfo myInfo = new MineInfo();
+		MineInfo myInfo = new MineInfo(index.getMemberNo());
 		index.showInCard(myInfo);
 		myInfo.display(member);
 	}

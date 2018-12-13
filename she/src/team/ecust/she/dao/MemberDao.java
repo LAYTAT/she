@@ -45,6 +45,36 @@ public final class MemberDao extends AbstractDao{
 		return false;
 	}
 	
+	/**if error return Member.NULL_CREDIT*/
+	public int getCreditOfMember(String memberNo) {
+		String sql = "select credit from Member where memberNo = '" + memberNo + "'";
+		Statement state = getStatement();
+		ResultSet result = getResult(state, sql);
+		if(result == null) {
+			closeStatement(state);
+			return Member.NULL_CREDIT;
+		}
+		try {
+			result.next();
+		} catch (SQLException e) {
+			setMessage("结果出错");
+			closeStatement(state);
+			return Member.NULL_CREDIT;
+		}
+		try {
+			return result.getInt(1);
+		} catch (SQLException e) {
+			setMessage("数据中断传输");
+		} finally {
+			closeStatement(state);
+		}
+		return Member.NULL_CREDIT;
+	}
+	
+	public boolean updateCreditOfMember(String memberNo, int credit) {
+		return update("update member set credit = " + credit + " where memberNo = '" + memberNo + "'");
+	}
+	
 	public boolean loginIn(String memberNo) {
 		return update("update Member set state = 'online' where memberNo = '" + memberNo + "'");
 	}
@@ -200,4 +230,30 @@ public final class MemberDao extends AbstractDao{
 		}
 		return false;
 	}
+	public String getPhone(String memberNo){
+		String sql = "select phone from member where memberNo = '" + memberNo + "'";
+		Statement state = getStatement();
+		ResultSet result = getResult(state, sql);
+		if(result == null) {
+			closeStatement(state);
+			return null;
+		}
+		try {
+			result.next();
+		} catch (SQLException e) {
+			setMessage("结果出错");
+			closeStatement(state);
+			return null;
+		}
+		try {
+			return result.getString(1);
+		} catch (SQLException e) {
+			setMessage("数据中断传输");
+		} finally {
+			closeStatement(state);
+		}
+		return null;
+	}
+	
+	
 }

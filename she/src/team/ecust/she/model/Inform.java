@@ -116,7 +116,7 @@ public final class Inform {
 		case CREDIT: 			return "credit";
 		case NEW_MSG: 		return "newmsg";
 		case CFM_ORDER: 	return "cfmorder";
-		case ORDER_INFO:   return "orderInfo";
+		case ORDER_INFO:   return "orderinfo";
 		case COMMENT:    return "comment";
 		default: return null;
 		}
@@ -141,17 +141,31 @@ public final class Inform {
 		switch (type) {
 		case "credit": this.type = InformType.CREDIT;
 			break;
-		case "new message":  this.type = InformType.NEW_MSG;
+		case "newmsg":  this.type = InformType.NEW_MSG;
 			break;
 		case "cfmorder":  this.type = InformType.CFM_ORDER;
 			break;
-		case "orderInfo":  this.type = InformType.ORDER_INFO;
-		break;
+		case "orderinfo":  this.type = InformType.ORDER_INFO;
+			break;
 		case "comment":  this.type = InformType.COMMENT;
-		break;
+			break;
 		default: return;
 		}		
 	}
+	
+	public String switchTypeToChinese() {
+		if(type == null)
+			return "";
+		switch(type) {
+		case CREDIT : return "信用分变更";
+		case NEW_MSG: return "新聊天消息";
+		case CFM_ORDER : return "确认订单信息";
+		case ORDER_INFO: return "订单更新信息";
+		case COMMENT : return "会员评论信息";
+		default : return "";
+		}
+	}
+	
 	/**@return 系统通知状态对应的字符*/
 	public String switchInformStateToString(){
 		if(state == null) return null;

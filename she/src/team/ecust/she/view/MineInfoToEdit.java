@@ -167,7 +167,7 @@ public class MineInfoToEdit extends JPanel {
 		order.setFont(Fonts.MODIFY_INFO_LEFT_TEXT.getFont());
 		order.setForeground(Colors.MODIFY_INFO_COMBOC_FOREGROUND.getColor());
 		order.setBackground(Colors.MODIFY_INFO_COMBOC_BACKGROUND.getColor());
-		for(int i = 1; i <= 14; i++)
+		for(int i = 1; i <= 21; i++)
 			order.addItem("第" + i + "室");
 		address.add(order);
 		

@@ -53,6 +53,22 @@ public final class DemandGoodsDao extends AbstractDao {
 		  return goods;
 	}
 	
+	public boolean deleteDemandGoods(String demandGoodsNo) {
+		if(update("delete from demandlabel where demandGoodsNo = '" + demandGoodsNo + "'") && 
+				update("delete from matchinfo where demandGoodsNo = '" + demandGoodsNo + "'"))
+			return update("delete from demandgoods where demandGoodsNo = '" + demandGoodsNo + "'");
+		setMessage("删除失败");
+		return false;
+	}
+	
+	public boolean updateGoodsStateToCancel(String demandGoodsNo) {
+		return update("update demandgoods set state = 'cancel' where demandGoodsNo = '" + demandGoodsNo + "'");
+	}
+	
+	public boolean updateGoodsStateToDone(String demandGoodsNo) {
+		return update("update demandgoods set state = 'done' where demandGoodsNo = '" + demandGoodsNo + "'");
+	}
+	
 	public DemandGoods[] getDemandGoodsByMember(String memberNo) {
 		String sql = "select demandGoodsNo,demandGoodsName,price,degree,uploadTime,note,state from DemandGoods where memberNo = '" + memberNo + "'";
 		  Statement state = getStatement();

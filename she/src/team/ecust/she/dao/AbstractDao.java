@@ -15,8 +15,8 @@ import java.sql.ResultSet;
 public abstract class AbstractDao {
 	/**MySQL驱动器选项{@value}*/
 	private final static String DRIVER   = "com.mysql.jdbc.Driver";
-	/**服务器数据库的URL{@value}*/
-	private final static String URL      = "jdbc:mysql://localhost:3306/she?characterEncoding=utf-8";
+	/**服务器数据库的URL{@value}192.168.31.112*/
+	private final static String URL      = "jdbc:mysql://192.168.31.112:3306/she?characterEncoding=utf-8";
 	/**服务器配置时的用户名{@value}*/
 	private final static String USER     = "root";
 	/**服务器配置时的密码{@value}*/

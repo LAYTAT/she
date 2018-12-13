@@ -17,6 +17,33 @@ public class MessageDao extends AbstractDao {
 		return update("update message set state = 'read' where receiverNo = '" + memberNo + "'");
 	}
 	
+	public boolean tipOffLatestMessage(String yourNo, String objectNo) {
+		String sql = "select messageNo, state from message where senderNo = '" + objectNo + "'"
+				+ " and receiverNo = '" + yourNo + "' and state <> 'toberead' order by sentTime desc limit 1";
+		Statement state = getStatement();
+		ResultSet result = getResult(state, sql);
+		if(result == null) {//查询出现异常 
+			closeStatement(state);
+			return false;
+		}
+		try {
+			if(result.next()) {//含有记录则为true
+				if(result.getString(2).equals("tipoff"))
+					return false;
+				return update("update message set state = 'tipoff' where "
+						+ " messageNo = '" + result.getString(1) + "' and senderNo = '"
+						+ objectNo + "' and receiverNo = '" + yourNo + "'");
+			}
+			else
+				return false;
+		} catch (SQLException e) {
+			setMessage("查询结果出错");//可能提前关闭了发送对象
+		} finally {
+			closeStatement(state);
+		}
+		return false;
+	}
+	
 	public boolean hasUnreadMessages(String memberNo) {
 		String sql = "select*from message where receiverNo='" + memberNo + "' and state = 'toberead'";
 		Statement state = getStatement();
@@ -36,8 +63,9 @@ public class MessageDao extends AbstractDao {
 		return false;
 	}
 	
+	/**已设为已读*/
 	public Message[] getUnreadMessages(String memberNo) {
-		String sql = "select*from message where receiverNo = '" + memberNo + "' and state = 'toberead'";
+		String sql = "select*from message where receiverNo = '" + memberNo + "' and state = 'toberead' order by sentTime ASC";
 		Statement state = getStatement();
 		ResultSet result = getResult(state, sql);
 		if(result == null) {//查询出现异常 

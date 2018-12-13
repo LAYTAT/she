@@ -10,6 +10,8 @@ import javax.swing.JComponent;
 import team.ecust.she.common.RandomNo;
 import team.ecust.she.dao.IdleGoodsDao;
 import team.ecust.she.dao.IdleLabelDao;
+import team.ecust.she.dao.MatchInfoDao;
+import team.ecust.she.dao.MemberDao;
 import team.ecust.she.dao.PhotoDao;
 import  team.ecust.she.dao.GoodVareityDao;
 import team.ecust.she.model.GoodsVariety;
@@ -50,18 +52,28 @@ public class UploadIdleGoodsController <K extends JComponent> extends MouseAdapt
 			String uploadIdleTime=sp1.format(new Date());
 			//生成10位闲置物品编号:
 			String idleGoodsNo=RandomNo.getDefaultRandomNo().getRandomNo(10);
-
+			
+			MemberDao memberDao=new MemberDao();
+			
 			//生成10位goodsVarietyNo:
 			//String goodsVarietyNo=RandomNo.getDefaultRandomNo().getRandomNo(10);
 //			System.out.println("idleGoodsNo"+idleGoodsNo);
-//			System.out.println("goodsVarietyNo"+goodsVarietyNo);
-
-					if(price.length() == 0 ||price.equals("xxx(人民币)")||!price.matches("^(([1-9]{1}\\d*)|([0]{1}))(\\.(\\d){0,2})?$")) {
+//			System.out.println("goodsVarietyNo");
+					System.out.print("会员"+index.getMemberNo()+"的手机号:"+memberDao.getPhone(index.getMemberNo()));
+					
+					if(memberDao.getPhone(index.getMemberNo()).equals(null)|| memberDao.getPhone(index.getMemberNo()).isEmpty()){
+						new PromptBox(Tips.ERROR).open("请先未登记手机号再上传!");
+						return;
+					}
+					else if(memberDao.getCreditOfMember(index.getMemberNo())<=70){
+						new PromptBox(Tips.ERROR).open("抱歉您信用分低于70,暂时不能上传!");
+					}
+					else if(price.length() == 0 ||price.equals("xxx(人民币)")||!price.matches("^([1-9][0-9]{0,4})|([1-9][0-9]{0,4}.[0-9]{1,2})")) {
 		    		
 		    			new PromptBox().open("请输入预期价格!(小数位最多两位)");
 		    			return;
 		    		}
-					else if(originalPrice.length() == 0 || originalPrice.equals("xxx(人民币)") || !originalPrice.matches("^(([1-9]{1}\\d*)|([0]{1}))(\\.(\\d){0,2})?$"))
+					else if(originalPrice.length() == 0 || originalPrice.equals("xxx(人民币)") || !originalPrice.matches("^([1-9][0-9]{0,4})|([1-9][0-9]{0,4}.[0-9]{1,2})"))
 		    		{
 		    			new PromptBox().open("请输入原价!(小数位最多两位)");
 		    			return;
@@ -89,7 +101,11 @@ public class UploadIdleGoodsController <K extends JComponent> extends MouseAdapt
 					{
 						new PromptBox(Tips.ERROR).open("请至少选择一张图片!");
 						return;
-					}
+					}else if (label1.matches(".*\'.*")|| label2.matches(".*\'.*") || goodsName.matches(".*\'.*")|| note.matches(".*\'.*")){
+						new PromptBox().open("不要输入单引号!");
+						return;
+							}
+
 					else {
 					
 					//传送
@@ -108,6 +124,7 @@ public class UploadIdleGoodsController <K extends JComponent> extends MouseAdapt
 						IdleLabelDao idleLabelDao=new IdleLabelDao();
 						GoodVareityDao goodVareityDao =new GoodVareityDao();
 						IdleGoodsDao idleGoodsDao=new IdleGoodsDao();
+						MatchInfoDao matchInfoDao=new MatchInfoDao();
 //						System.out.println("idleGoods.getKeyWord1():"+idleGoods.getKeyWord1());
 //						System.out.println("idleGoods.getKeyWord2():"+idleGoods.getKeyWord2());
 //						System.out.println("idleGoods.getKeyWord3():"+idleGoods.getKeyWord3());
@@ -158,11 +175,11 @@ public class UploadIdleGoodsController <K extends JComponent> extends MouseAdapt
 								System.out.println("goodVareityDao.getGoodsVarietyNoByKeyword(idleGoods.getKeyWord2())="+goodVareityDao.getGoodsVarietyNoByKeyword(idleGoods.getKeyWord2()));
 								System.out.println("idleGoods.getKeyWord2()="+idleGoods.getKeyWord2());
 								if(!idleLabelDao.insertNewIdleLabel(idleLabel2)){
-									new PromptBox(Tips.ERROR).open("数据库传输出现错误!");
-									System.out.println("数据库传输出2现错误!");
-									return;
-									}
+								new PromptBox(Tips.ERROR).open("数据库传输出现错误!");
+								System.out.println("数据库传输出2现错误!");
+								return;
 								}
+							}
 							//上传闲置标签3idlegoodsLabel表
 							  if(!goodVareityDao.existGoodVareity(idleGoods.getKeyWord3()))  // 上传物品的标签3是否存在
 								{   //不存在则将keyword3添加到goodsvarity表里,并且将对应的的goodsvareityNo存到idlelabel表里				
@@ -226,6 +243,12 @@ public class UploadIdleGoodsController <K extends JComponent> extends MouseAdapt
 									
 								 
 							new PromptBox(Tips.TICK).open("上传成功!");
+							
+							//匹配
+							System.out.println("新上传的闲置是否匹配:"+matchInfoDao.isNewIdleFGoodsMatched(idleGoods)+"\n");
+							System.out.print(matchInfoDao.insertNewIdleMatchDemandInfo(idleGoods)[1]);
+							System.out.print(matchInfoDao.insertNewIdleMatchDemandInfo(idleGoods)[2]);
+							matchInfoDao.insertNewIdleMatchDemandInfo(idleGoods);
 							UploadIdleGoods up=new UploadIdleGoods();
 							index.showInCard(up);
 							up.display();

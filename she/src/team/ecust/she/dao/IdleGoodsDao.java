@@ -27,7 +27,7 @@ public final class IdleGoodsDao extends AbstractDao {
 	}
 	
 	public IdleGoods[] getIdleGoodsByLatestGoods() {
-		return getIdleGoodsBySQL("SELECT uploadTime FROM idlegoods ORDER BY uploadTime DESC LIMIT 0,50");
+		return getIdleGoodsBySQL("SELECT*FROM idlegoods ORDER BY uploadTime DESC LIMIT 0,50");
 	}
 	
 	public IdleGoods[] getIdleGoodsBySQL(String sql) {
@@ -154,7 +154,8 @@ public final class IdleGoodsDao extends AbstractDao {
 	  }
 	  
 	  public IdleGoods[] getIdleGoodsByMember(String memberNo) {
-		  String sql = "select idleGoodsNo,idleGoodsName,salePrice,originalPrice,degree,uploadTime,note,state from IdleGoods where memberNo = '" + memberNo + "'";
+		  String sql = "select idleGoodsNo,idleGoodsName,salePrice,originalPrice,degree,uploadTime,note,state"
+		  		+ " from IdleGoods where memberNo = '" + memberNo + "'";
 		  Statement state = getStatement();
 		  ResultSet result = getResult(state, sql);
 		  if(result == null) {//查询出现异常 
@@ -195,7 +196,7 @@ public final class IdleGoodsDao extends AbstractDao {
 	  }
 	  
 	  public IdleGoods getIdleGoodsByIdleGoods(String idleGoodsNo) {
-		  String sql = "select idleGoodsName,salePrice,originalPrice,degree,uploadTime,note,state from IdleGoods where idleGoodsNo = '" + idleGoodsNo + "'";
+		  String sql = "select idleGoodsNo,idleGoodsName,salePrice,originalPrice,degree,uploadTime,note,state from IdleGoods where idleGoodsNo = '" + idleGoodsNo + "'";
 		  Statement state = getStatement();
 		  ResultSet result = getResult(state, sql);
 		  if(result == null) {//查询出现异常 
@@ -210,14 +211,14 @@ public final class IdleGoodsDao extends AbstractDao {
 			  return null;
 		  }
 		  try {
-				  IdleGoods goods = new IdleGoods("");
-				  goods.setIdleGoodsName(result.getString(1));
-				  goods.setSalePrice(result.getFloat(2));
-				  goods.setOriginalPrice(result.getFloat(3));
-				  goods.setDegree(result.getInt(4));
-				  goods.setUploadTime(result.getString(5));
-				  goods.setNote(result.getString(6));
-				  goods.switchIdleGoodsStateToEnum(result.getString(7));
+				  IdleGoods goods = new IdleGoods(result.getString(1));
+				  goods.setIdleGoodsName(result.getString(2));
+				  goods.setSalePrice(result.getFloat(3));
+				  goods.setOriginalPrice(result.getFloat(4));
+				  goods.setDegree(result.getInt(5));
+				  goods.setUploadTime(result.getString(6));
+				  goods.setNote(result.getString(7));
+				  goods.switchIdleGoodsStateToEnum(result.getString(8));
 				  return goods;
 		  } catch (SQLException e) {
 			  setMessage("数据中断传输");
@@ -263,10 +264,32 @@ public final class IdleGoodsDao extends AbstractDao {
 		  }
 		  return variety;
 	  }
+	  
+	 public boolean updateState(String goodsNo, String state) {
+		 return update("update idlegoods set state = '" + state + "' where idlegoodsNo = '" + goodsNo + "'");
+	 }
 	
-	//public boolean updateIdleGoods(IdleGoods goods) {
-		
-	//}
+	public boolean updateIdleGoods(IdleGoods goods) {
+		String sql = "update IdleGoods set idleGoodsName=?,salePrice=?,"
+				+ "originalPrice=?,degree=?,state=?,note=? where idleGoodsNo = '" + goods.getIdleGoodsNo() + "'";
+		PreparedStatement state = getPreparedStatement(sql);
+		try {
+			state.setString(1, goods.getIdleGoodsName());
+			state.setFloat(2, goods.getSalePrice());
+			state.setFloat(3, goods.getOriginalPrice());
+			state.setInt(4, goods.getDegree());
+			state.setString(5, goods.switchIdleGoodsStateToString());
+			state.setString(6, goods.getNote());
+			state.executeUpdate();
+			return true;
+		} catch (SQLException e1) {
+			setMessage("数据中断传输");
+		} finally {
+			closeStatement(state);
+		}
+		return false;
+	}
+	
 	public String getMemberNoByIdleGoods(String idleGoodsNo) {
 		String sql = "select memberNo from IdleGoods where idleGoodsNo = '" + idleGoodsNo + "'";
 		Statement state = getStatement();
@@ -286,10 +309,12 @@ public final class IdleGoodsDao extends AbstractDao {
 		return null;
 	}
 	
-	/**@deprecated*/
 	public boolean deleteIdleGoods(String idleGoodsNo) {
-		//增加一致性
-		return update("delete from IdleGoods where idleGoodsNo = '" + idleGoodsNo + "'");
+		if(update("delete from IdleLabel where idleGoodsNo = '" + idleGoodsNo + "'") &&
+				update("delete from Picture where idleGoodsNo = '" + idleGoodsNo + "'") &&
+				update("delete from matchinfo where idleGoodsNo = '" + idleGoodsNo + "'"))
+			return update("delete from IdleGoods where idleGoodsNo = '" + idleGoodsNo + "'");
+		return false;
 	}
 	
 	public boolean insertNewIdleGoods(IdleGoods goods) {

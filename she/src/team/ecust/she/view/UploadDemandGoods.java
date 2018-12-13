@@ -76,7 +76,8 @@ public final class UploadDemandGoods extends JPanel {
 				case 2: return "日常用品";
 				case 3: return "食品";
 				case 4: return "纪念品";
-				case 5: return "其他";
+				case 5: return "工具类";
+				case 6: return "其他";
 				default: return null;
 						}
 	}

@@ -7,6 +7,7 @@ import java.text.SimpleDateFormat;
 import javax.swing.JComponent;
 
 import team.ecust.she.dao.EcustDao;
+import team.ecust.she.dao.MemberDao;
 import team.ecust.she.model.Member;
 import team.ecust.she.view.Index;
 import team.ecust.she.view.Login;
@@ -31,12 +32,16 @@ private Register register;
 		String Password=register.getPassword();
 		String confirmPassword=register.getCfmPassword();
 		//注册时间:
-		SimpleDateFormat sp1=new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
+		SimpleDateFormat sp1=new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 				//SimpleDateFormat("yyyy-MM-dd hh"+"'"+"mm""ss");
 		String registerTime=sp1.format(new java.util.Date());
-		
-		
-		
+		EcustDao ecustDao=new EcustDao();
+			
+		//检测是否已经注册
+    	 MemberDao memberDao =new MemberDao();
+			//新建member会员信息
+		 Member member = ecustDao.getEcustinfo(studentID);
+		 
 		 if(ID ==null || ID.length()!=18){
 		    	(new PromptBox()).open("请输入正确的18位身份证号码!");
 		    	return;
@@ -45,8 +50,13 @@ private Register register;
 			(new PromptBox()).open("请输入正确的8位学号!");
 			return;
 		}
-		else if(Alias.length() == 0) {
-			(new PromptBox()).open("请输入昵称!");
+		else if(memberDao.existItem(member.getMemberNo()))
+			 {
+				 (new PromptBox(Tips.ERROR)).open("你已经注册过了,请不要重复注册!");
+				 return;
+			 }
+		else if(Alias.length() == 0|| Alias.length()>=10) {
+			(new PromptBox()).open("请输入10位内昵称!");
 			return;
 		}
 		else if(Email.length() == 0){
@@ -77,35 +87,42 @@ private Register register;
 			(new PromptBox()).open("两次密码不一致!");//string.equals()有问题
 			return;
 		}
-		 EcustDao ecustDao=new EcustDao();
-		
+
+
 		 if(ecustDao.identityCheck(ID, studentID)){
 			 //身份验证通过之后:
-			 //打开登陆界面
+			//打开登陆界面
 			 Login login=new Login();
 			 Index index = Index.getInstance();
 			 index.showInCard(login);
 			 login.display();
-				//新建member会员信息
-			 Member member = ecustDao.getEcustinfo(studentID);
+
 			 member.setMemberNo(studentID);
 	     	 member.setCipher(Password.toString());
 	     	 member.setMailbox(Email);
 	     	 member.setNickname(Alias);
 	     	 member.setRegisterTime(registerTime);
-	      	 boolean isRegistered=ecustDao.insertMembership(member);
-	     	 if(isRegistered) {
+	     	 
+
+	     	
+	      	boolean isRegistered=ecustDao.insertMembership(member);
+	     	 if(isRegistered){
 	     		(new PromptBox(Tips.TICK)).open("身份验证通过,注册成功!");
 	     	 }
 	     	 else {
 	     		(new PromptBox(Tips.ERROR)).open("数据库中断传输!");
 	     	 }
-		 } else {
+		 }
+		 else{
 			 (new PromptBox(Tips.ERROR)).open("身份校验失败,请检查你的是否正确!");
 		 }
+}
+
+     	 //member信息已经完全:8个
      	 
 
-	}
+
+	
 	
 	
 	@Override

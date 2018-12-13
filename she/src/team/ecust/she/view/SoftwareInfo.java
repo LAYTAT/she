@@ -114,9 +114,9 @@ public class SoftwareInfo extends JPanel {
 			@Override
 			public void mouseWheelMoved(MouseWheelEvent e) {
 				if(e.getWheelRotation() == MouseWheelEvent.WHEEL_BLOCK_SCROLL) 
-					adjust(10);
-				else if(e.getWheelRotation() == -MouseWheelEvent.WHEEL_BLOCK_SCROLL)
 					adjust(-10);
+				else if(e.getWheelRotation() == -MouseWheelEvent.WHEEL_BLOCK_SCROLL)
+					adjust(10);
 				repaint();
 			}
 		});

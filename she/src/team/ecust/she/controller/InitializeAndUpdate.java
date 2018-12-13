@@ -27,29 +27,6 @@ public final class InitializeAndUpdate extends TimerTask {
 		else {
 			index.setReadMessage(true);
 		}
-		
-		/**
-		MessageDao messageDao = new MessageDao();
-		InformDao informDao = new InformDao();
-		Message[] messages = messageDao.getUnreadMessages(index.getMemberNo());
-		Inform[] informs = informDao.getUnreadInforms(index.getMemberNo());
-		if((messages == null || messages.length == 0) && (informs == null || informs.length == 0)) {
-			index.setReadMessage(true);
-			return;
-		}
-		index.setReadMessage(false);
-		
-		for(int i = 0; i < informs.length; i++) {
-			FileTool tool = new FileTool(index.getMemberNo() + "/informs");
-			tool.append("\n#" + informs[i].getSentTime());
-			tool.append("\n@" + informs[i].getInformType());
-			tool.append("\n$" + informs[i].getContent());
-		}
-		for(int i = 0; i < messages.length; i++) {
-			FileTool tool = new FileTool(index.getMemberNo() + "/" + messages[i].getSenderNo());
-			tool.append("\n[" + messages[i].getSentTime() + " 对方]");
-			tool.append("\n" + messages[i].getContent());
-		}*/
 	}
 	
 	@Override

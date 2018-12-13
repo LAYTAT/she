@@ -23,6 +23,8 @@ public class LoginIn <K extends JComponent> extends MouseAdapter {
 	}
 	
 	public synchronized static void doIt(Login login) {
+		if(!login.isEnabledOfConfirmButton())
+			return;
 		login.setConfirmButtonEnabled(false);
 		Index index = Index.getInstance();
 		if(!Index.VISITOR.equals(index.getMemberNo())) {

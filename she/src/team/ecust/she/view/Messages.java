@@ -3,6 +3,8 @@ package team.ecust.she.view;
 import java.awt.BorderLayout;
 
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+
 import java.awt.GridLayout;
 import java.awt.CardLayout;
 import java.awt.Dimension;
@@ -14,12 +16,24 @@ import javax.swing.border.LineBorder;
 import javax.swing.border.MatteBorder;
 
 import team.ecust.she.common.FileTool;
+import team.ecust.she.controller.SendMessageToOthers;
+import team.ecust.she.controller.TipOffMessage;
+import team.ecust.she.dao.IdleGoodsDao;
+import team.ecust.she.dao.InformDao;
 import team.ecust.she.dao.MemberDao;
+import team.ecust.she.dao.MessageDao;
+import team.ecust.she.dao.OrderDao;
+import team.ecust.she.model.IdleGoods;
+import team.ecust.she.model.Inform;
 import team.ecust.she.model.Member;
+import team.ecust.she.model.Message;
+import team.ecust.she.model.Order;
 
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.File;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.Vector;
 
 import javax.swing.JTextArea;
@@ -28,6 +42,7 @@ import javax.swing.JComponent;
 
 @SuppressWarnings("serial")
 public class Messages extends JPanel {
+	private static Timer update;
 	
 	private boolean options;//true:inform, false:chat
 	private String objectNo;
@@ -36,6 +51,7 @@ public class Messages extends JPanel {
 	private JLabel object;
 	private ChatRecord record;
 	private JTextArea message;
+	private Vector<MessagesList>lists;
 	
 	public boolean getOptions() {
 		return options;
@@ -58,6 +74,13 @@ public class Messages extends JPanel {
 	public void clearMessage() {
 		message.setText("");
 	}
+	public Vector<MessagesList> getLists() {
+		return lists;
+	}
+	public static void cancelUpdate() {
+		if(update != null)
+			update.cancel();
+	}
 	
 	public void showInContent(JComponent component) {
 		if(component != null) {
@@ -72,7 +95,7 @@ public class Messages extends JPanel {
 		if(!f.exists())
 			f.mkdir();
 		File[] list = f.listFiles();
-		if(list == null)
+		if(list == null || list.length == 0)
 			return;
 		Vector<File> members = new Vector<File>();
 		for(int i = 0; i < list.length; i++) {
@@ -85,15 +108,18 @@ public class Messages extends JPanel {
 		if(members.size() == 0)
 			return;
 		JPanel panel = new JPanel();
+		showInContent(new JScrollPane(panel));
 		if(members.size() < (getHeight() - 100)/100)
 			panel.setLayout(new GridLayout((getHeight() - 100)/100, 0, 0, 20));
 		else
 			panel.setLayout(new GridLayout(members.size(), 0, 0, 20));
 		FileTool tool = new FileTool("");
 		File file = null;
+		lists = new Vector<MessagesList>();
 		for(int i = 0; i < members.size(); i++) {
 			file = members.elementAt(i);
 			MessagesList messages = new MessagesList(file.getName());
+			lists.add(i, messages);
 			panel.add(messages);
 			messages.display(this);
 			tool.setFilePath(file.getAbsolutePath());
@@ -105,11 +131,98 @@ public class Messages extends JPanel {
 				messages.setNickName(member.getNickname());
 			}
 		}
-		showInContent(panel);
 	}
 	
 	public void showInformList() {
-		
+		File f = new File("src/team/ecust/she/resource/file/" + Index.getInstance().getMemberNo());
+		if(!f.exists())
+			f.mkdir();
+		f = new File("src/team/ecust/she/resource/file/" + Index.getInstance().getMemberNo() + "/informs");
+		if(!f.exists())
+			return;
+		JPanel panel = new JPanel();
+		showInContent(new JScrollPane(panel));
+		FileTool tool = new FileTool(Index.getInstance().getMemberNo() + "/informs");
+		int rows = (tool.getAllLines() - 1)/4;
+		if(rows < (getHeight() - 100)/140)
+			panel.setLayout(new GridLayout((getHeight() - 100)/140, 0, 0, 20));
+		else
+			panel.setLayout(new GridLayout(rows, 0, 0, 20));
+		for(int i = 0; i < rows; i++) {
+			Inform inform = new Inform(tool.readTheLine(4*i + 2));
+			inform.setSentTime(tool.readTheLine(4*i + 3));
+			inform.switchTypeStringToEnum(tool.readTheLine(4*i + 4));
+			inform.setContent(tool.readTheLine(4*i + 5));
+			InformList list = new InformList(inform.getInformNo());
+			list.setOrderNo(inform.getContent());
+			panel.add(list);
+			list.display(inform);
+			list.setContent(getContentFromType(inform));
+		}
+	}
+	
+	public String getContentFromType(Inform inform) {
+		if(inform.getInformType() == null)
+			return "通知信息丢失";
+		switch (inform.getInformType()) {
+		case CREDIT:
+			return inform.getContent();
+		case NEW_MSG:
+			return inform.getContent();
+		case ORDER_INFO:
+			return inform.getContent();
+		case COMMENT:
+			return inform.getContent();
+		case CFM_ORDER:
+			OrderDao dao = new OrderDao();
+			if(!dao.existItemByOrder(inform.getContent()))
+				return "订单不存在";
+			Order order = dao.getOrderByOrder(inform.getContent());
+			if(order == null)
+				return "订单查询失败";
+			IdleGoodsDao goodsDao = new IdleGoodsDao();
+			IdleGoods goods = goodsDao.getIdleGoodsByIdleGoods(order.getIdleGoodsNo());
+			if(goods == null)
+				return "订单查询失败";
+			return "物品编号：" + order.getIdleGoodsNo() + "\n物品名称：" + goods.getIdleGoodsName() +
+					"\n成交价格：" + order.getPrice() + "元\n交易期限：" + order.getDeadline();
+		default: return "";
+		}
+	}
+	
+	public void updateMessage() {
+		if(update != null)
+			update.cancel();
+		(update = new Timer()).schedule(new TimerTask() {
+			@Override
+			public void run() {
+				Index index = Index.getInstance();
+				if(index.isReadMessage())
+					return;
+				MessageDao messageDao = new MessageDao();
+				InformDao informDao = new InformDao();
+				Message[] messages = messageDao.getUnreadMessages(index.getMemberNo());
+				Inform[] informs = informDao.getUnreadInforms(index.getMemberNo());
+				if((messages == null || messages.length == 0) && (informs == null || informs.length == 0))
+					return;
+				
+				for(int i = 0; i < informs.length; i++) {
+					FileTool tool = new FileTool(index.getMemberNo() + "/informs");
+					tool.append("\n" + informs[i].getInformNo());
+					tool.append("\n" + informs[i].getSentTime());
+					tool.append("\n" + informs[i].switchInformTypeToString());
+					tool.append("\n" + informs[i].getContent());
+				}
+				for(int i = 0; i < messages.length; i++) {
+					FileTool tool = new FileTool(index.getMemberNo() + "/" + messages[i].getSenderNo());
+					tool.append("\n[" + messages[i].getSentTime() + " 对方]");
+					tool.append("\n" + messages[i].getContent());
+					if(messages[i].getSenderNo().equals(getChatRecord().getObjectNo()))
+						getChatRecord().display(objectNo);
+				}
+				index.setReadMessage(true);
+			}
+		}, 2000, 2000);
 	}
 	
 	public Messages(boolean option) {
@@ -211,22 +324,19 @@ public class Messages extends JPanel {
 		operate.setPreferredSize(new Dimension(200, 300));
 		input.add(operate, BorderLayout.EAST);
 		
-		JButton send = new JButton("发送");
-		send.addMouseListener(new MouseAdapter() {
-			@Override
-			public void mouseClicked(MouseEvent e) {
-				clearMessage();
-			}
-		});
+		JButton send = new JButton("发送消息");
+		send.addMouseListener(new SendMessageToOthers(this));
 		send.setFont(Fonts.MESSAGES_SEND_BUTTON.getFont());
 		send.setBackground(Colors.MESSAGES_SEND_BUTTON_BACKGROUND.getColor());
 		operate.add(send);
 		
-		JButton tipoff = new JButton("举报");
+		JButton tipoff = new JButton("举报最近消息");
+		tipoff.addMouseListener(new TipOffMessage(this));
 		tipoff.setFont(Fonts.MESSAGES_SEND_BUTTON.getFont());
 		tipoff.setBackground(Colors.MESSAGES_TIPOFF_BUTTON_BACKGROUND.getColor());
 		operate.add(tipoff);
 		
+		updateMessage();
 		if(options) {
 			inform.setBackground(Colors.MESSAGES_MODE_OPTIONS_BACKGROUND.getColor());
 			showInformList();

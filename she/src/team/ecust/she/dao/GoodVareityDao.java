@@ -11,7 +11,7 @@ public final class GoodVareityDao extends AbstractDao   {
 	
 	public boolean updateHotDegree(String keyWord) {
 		String sql = "update goodsvariety set degree = degree + 1 "
-				+ "where keyWord like '%" + keyWord + "%' or description like '%" + keyWord + "%'";
+				+ " where keyWord like '%" + keyWord + "%' or description like '%" + keyWord + "%'";
 		return update(sql);
 	}
 	
@@ -42,8 +42,6 @@ public final class GoodVareityDao extends AbstractDao   {
 
 				state.setString(1, goodsVariety.getGoodsVarietyNo());
 				state.setString(2, goodsVariety.getKeyWord());
-				System.out.println("goodsVariety.getGoodsVarietyNo():"+goodsVariety.getGoodsVarietyNo());
-				System.out.println(" goodsVariety.getKeyWord():"+ goodsVariety.getKeyWord());
 				state.executeUpdate();
 			return true;
 		} catch (SQLException e) {

@@ -122,13 +122,14 @@ public void switchDemandGoodsStateToEnum(String state){
 		return;
 	switch(state){
 	case "done": 
-		this.state=DemandGoodsState.DONE;	
+		this.state=DemandGoodsState.DONE;break;
 	case "cancel":
-		this.state=DemandGoodsState.CANCEL;
+		this.state=DemandGoodsState.CANCEL;break;
 	case "matched":
-		this.state=DemandGoodsState.MATCHED;
+		this.state=DemandGoodsState.MATCHED;break;
 	case "tobematched":
-		this.state=DemandGoodsState.TO_BE_MATCHED;
+		this.state=DemandGoodsState.TO_BE_MATCHED;break;
+	default : break;
 	}
 }
 
@@ -149,8 +150,8 @@ public String switchDemandGoodsStateToChinese(){
 	switch(state){
 		case DONE: return "成功完成";
 		case CANCEL:return "不再需要";
-		case MATCHED: return "可以完成";
 		case TO_BE_MATCHED: return "等待完成";
+		case MATCHED: return "可以完成";
 		default:return null;
 	}
 }

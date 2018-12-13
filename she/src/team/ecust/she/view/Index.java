@@ -284,6 +284,9 @@ public final class Index {
 					setMemberNo(VISITOR);
 					setHeadPortrait("src/team/ecust/she/resource/image/unknown.jpg");
 					setNickname("未登录...");
+					Messages.cancelUpdate();
+					setReadMessage(true);
+					updateMessages(true);
 				}
 				Login login = new Login();
 				showInCard(login);
@@ -416,15 +419,14 @@ public final class Index {
 			}
 			@Override
 			public void mouseClicked(MouseEvent e) {
-				/*
 				int width = frame.getWidth();
 				if(width != SCREEN_WIDTH) {
 					blank.setPreferredSize(new Dimension(blank.getWidth()+width/3, 10));
 					frame.setExtendedState(frame.getState() | JFrame.MAXIMIZED_BOTH);
 				} else {
 					blank.setPreferredSize(new Dimension(blank.getWidth()-width/3, 10));
-					frame.setBounds(100, 100, 2*width/3, 2*frame.getHeight()/3);
-				}*/
+					frame.setBounds(300, 100, 2*width/3, 2*frame.getHeight()/3);
+				}
 			}
 		});
 		maximum.setIcon(new ImageIcon(Index.class.getResource("/team/ecust/she/resource/image/maximum_fo.png")));
@@ -525,7 +527,7 @@ public final class Index {
 		hotsale.setIcon(new ImageIcon(Index.class.getResource("/team/ecust/she/resource/image/hotsale.png")));
 		content.add(hotsale);
 		
-		JButton latest = new JButton("最近更新");
+		JButton latest = new JButton("最近上新");
 		latest.addMouseListener(new ViewIdleGoodsByContent<JButton>(latest, false));
 		latest.setBorder(null);
 		latest.setFont(Fonts.LEFT_CONTENT_OPTION.getFont());
@@ -791,7 +793,7 @@ public final class Index {
 	 * 设置消息的已读状态，true表示已读，false表示未读。
 	 * @param readMessage 需要设置的消息的状态
 	 */
-	public void setReadMessage(boolean readMessage) {
+	public synchronized void setReadMessage(boolean readMessage) {
 		this.readMessage = readMessage;
 		updateMessages(true);
 	}
